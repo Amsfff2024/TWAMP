@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>TWAMP Dashboard - Issue Tracker</title>
+    <title>Twamp Dashboard - Network Issue Tracker</title>
     <!-- Bootstrap 5 + Icons + Fonts -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -61,21 +61,92 @@
         .table-header-sticky th {
             background: #1e293b;
             color: white;
-            font-weight: 600;
-            font-size: 0.7rem;
+            font-weight: 700;
+            font-size: 0.85rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             position: sticky;
             top: 0;
             z-index: 10;
+            padding: 12px 8px;
         }
         .site-id-mono { font-family: 'SF Mono', monospace; font-weight: 600; color: #075985; }
         .chart-card { background: white; border-radius: 24px; padding: 1rem; height: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .btn-outline-custom { border-radius: 30px; padding: 6px 16px; font-weight: 500; }
-        .detail-table-container { background: white; border-radius: 28px; overflow: hidden; box-shadow: 0 12px 28px rgba(0,0,0,0.08); margin-top: 1rem; }
-        .cursor-sort { cursor: pointer; user-select: none; }
-        .scroll-table { max-height: 480px; overflow-y: auto; }
+        .detail-table-container { 
+            background: white; 
+            border-radius: 28px; 
+            overflow: hidden; 
+            box-shadow: 0 12px 28px rgba(0,0,0,0.08); 
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+        }
+        .detail-header-bar {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .cursor-sort { cursor: pointer; user-select: none; transition: 0.1s; }
+        .cursor-sort:hover { background-color: #2d3a4e; }
+        .scroll-table { 
+            max-height: 550px; 
+            overflow-y: auto; 
+            overflow-x: auto;
+        }
+        /* Improved table font and readability */
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 1100px;
+        }
+        .detail-table th, .detail-table td {
+            padding: 12px 10px;
+            vertical-align: middle;
+            border-bottom: 1px solid #eef2f6;
+        }
+        .detail-table th {
+            background: #1e293b;
+            color: white;
+            font-weight: 700;
+            font-size: 0.85rem;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+        .detail-table td {
+            font-size: 13px;
+            line-height: 1.4;
+            color: #1f2a44;
+        }
+        .detail-table .site-id-mono {
+            font-family: 'SF Mono', monospace;
+            font-weight: 700;
+            font-size: 12.5px;
+        }
+        .badge-sm-custom {
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 30px;
+        }
         .footer-note { font-size: 11px; color: #5b6e8c; }
+        .table-responsive-wrapper {
+            overflow-x: auto;
+        }
+        /* aging badge */
+        .aging-badge {
+            padding: 4px 8px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 11px;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -83,7 +154,7 @@
 <div class="hero-header">
     <div class="container-fluid d-flex justify-content-between align-items-center flex-wrap">
         <div>
-            <h1 class="text-white mb-0" style="font-family: 'Plus Jakarta Sans'; font-weight: 800;"><i class="fas fa-chart-network me-2"></i>Twamp Dashboard</h1>
+            <h1 class="text-white mb-0" style="font-family: 'Plus Jakarta Sans'; font-weight: 800;"><i class="fas fa-tachometer-alt me-2"></i>Twamp Dashboard</h1>
             <p class="text-white-50 mb-0 small">Network Issue Intelligence & Resolution Tracker</p>
         </div>
         <div class="text-end">
@@ -116,13 +187,12 @@
         </div>
     </div>
 
-    <!-- Charts Row 1 -->
+    <!-- Charts Row (Priority chart removed) -->
     <div class="row g-4 mb-4">
-        <div class="col-lg-4"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-chart-pie me-2 text-primary"></i>Status Breakdown</h6><canvas id="statusChart" height="200"></canvas></div></div>
-        <div class="col-lg-4"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-chart-simple me-2 text-warning"></i>Priority Levels</h6><canvas id="priorityChart" height="200"></canvas></div></div>
-        <div class="col-lg-4"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-bug me-2 text-danger"></i>Top Problem Categories</h6><canvas id="categoryChart" height="200"></canvas></div></div>
+        <div class="col-lg-5"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-chart-pie me-2 text-primary"></i>Status Breakdown</h6><canvas id="statusChart" height="220"></canvas></div></div>
+        <div class="col-lg-7"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-bug me-2 text-danger"></i>Top Problem Categories</h6><canvas id="categoryChart" height="220"></canvas></div></div>
     </div>
-    <!-- Charts Row 2 -->
+    <!-- Charts Row 2 (circle, vendor, pic) -->
     <div class="row g-4 mb-4">
         <div class="col-lg-4"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-globe me-2 text-info"></i>Issues by Circle</h6><canvas id="circleChart" height="200"></canvas></div></div>
         <div class="col-lg-4"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-microchip me-2 text-secondary"></i>Vendor Analysis</h6><canvas id="vendorChart" height="200"></canvas></div></div>
@@ -136,22 +206,43 @@
         <div class="col-md-4"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-chart-line me-2"></i>Vendor Performance</h6><div style="max-height: 280px; overflow-y: auto;"><table class="table table-sm table-hover"><thead class="table-light"><tr><th>Vendor</th><th>Issues</th><th>Open</th><th>Avg Aging</th></tr></thead><tbody id="vendorPerfTable"><tr><td colspan="4" class="text-center">—</td></tr></tbody></table></div></div></div>
     </div>
 
-    <!-- Detailed Table (hidden by default) -->
-    <div id="detailTablePanel" style="display: none;" class="detail-table-container mb-4">
-        <div class="p-3 bg-white d-flex justify-content-between border-bottom align-items-center"><h5 class="mb-0 fw-bold"><i class="fas fa-rectangle-list me-2"></i>Issue Details</h5><div><span class="badge bg-secondary me-2" id="detailCountBadge">0 rows</span><button class="btn btn-sm btn-outline-danger" onclick="hideDetailTable()"><i class="fas fa-times"></i> Close</button></div></div>
+    <!-- Detailed Table Panel (Improved: header above table with row count and close button) -->
+    <div id="detailTablePanel" style="display: none;" class="detail-table-container">
+        <div class="detail-header-bar">
+            <div>
+                <h5 class="mb-0 fw-bold"><i class="fas fa-rectangle-list me-2 text-primary"></i>Issue Details</h5>
+                <span class="badge bg-secondary mt-1" id="detailCountBadge">0 rows</span>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="hideDetailTable()"><i class="fas fa-times me-1"></i> Close</button>
+            </div>
+        </div>
         <div class="scroll-table">
-            <table class="table table-sm table-striped mb-0" style="min-width: 900px;">
-                <thead class="table-header-sticky">
-                    <tr>
-                        <th class="cursor-sort" onclick="sortBy('siteId')">Site ID <i class="fas fa-sort"></i></th><th onclick="sortBy('problemCategory')">Problem</th><th onclick="sortBy('priority')">Priority</th><th onclick="sortBy('status')">Status</th><th onclick="sortBy('aging')">Aging</th><th onclick="sortBy('pic')">PIC</th><th>Root Cause</th><th>Circle</th><th>Vendor</th>
-                    </tr>
-                </thead>
-                <tbody id="detailTableBody"></tbody>
-            </table>
+            <div class="table-responsive-wrapper">
+                <table class="detail-table" id="issuesDetailTable">
+                    <thead>
+                        <tr>
+                            <th class="cursor-sort" onclick="sortBy('siteId')">Site ID <i class="fas fa-sort ms-1"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('problemCategory')">Problem Category <i class="fas fa-sort ms-1"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('priority')">Priority <i class="fas fa-sort ms-1"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('status')">Status <i class="fas fa-sort ms-1"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('aging')">Aging (days) <i class="fas fa-sort ms-1"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('pic')">PIC <i class="fas fa-sort ms-1"></i></th>
+                            <th>Root Cause / RCA</th>
+                            <th>Circle</th>
+                            <th>Vendor</th>
+                            <th>Action / Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailTableBody">
+                        <tr><td colspan="10" class="text-center py-4">Loading data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <div class="text-center footer-note pb-3">Data source: Google Sheets (auto-refresh every 30s) | <i class="fas fa-sync-alt"></i> Live updates</div>
+    <div class="text-center footer-note pb-3">Data source: Google Sheets (auto-refresh every 30s) | <i class="fas fa-sync-alt"></i> Live updates | Twamp Dashboard</div>
 </div>
 
 <script>
@@ -161,14 +252,13 @@
     let masterData = [];
     let filteredData = [];
     let charts = {};
-    let currentSort = { field: 'aging', dir: 'desc' };
+    let currentSortField = 'aging';
+    let currentSortDir = 'desc';
     let autoInterval = null;
 
-    // helpers
     function updateClock() { const now = new Date(); document.getElementById('liveClock').innerText = now.toLocaleTimeString('en-GB'); }
     setInterval(updateClock, 1000); updateClock();
 
-    // fetch & parse
     async function loadData() {
         document.getElementById('dataStatusBadge').innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Fetching...';
         try {
@@ -188,8 +278,6 @@
         const dataset = [];
         const circlesSet = new Set(), categoriesSet = new Set();
         rows.forEach(row => {
-            // map columns based on provided sample: "Link ID Segment Problem", "Date Twamp List", "Priority", "Status Chronic", "Site ID", "Circle", "Region", "Domain", "Tx Type", "Vendor Link", "RCA Grouping Auto", "RCA", "PIC Final", "Status TT", etc.
-            // but sample uses headers: "Link ID Segment Problem", "Date Twamp List", "Priority", "Occurance / Sum Issue", "Status Chronic", "Site ID", "UNIQ", "Circle", "Region", "Domain", "Tx Type", "Link Route", "Single Demarcation", "RCA Grouping Auto", "Group criteria prio", "Criteria Priority", "RCA", "Detail RCA", "Remark BO TX", "Site ID Problem", "Link ID Segment Problem", "Vendor Link", "Update PIC", "RCA Simplify", "Operation RCA Final", "PIC Final", "Status TT", "Status RMA", "RMA", "TT", "WO", "Date Action FSO", "Action", "Status FSO", "Date Action NDO", "Action", "Status NDO", "Update BO TX Xcheck", "Status", "Final Status", "Update PIC", "Date Remark"
             const siteId = (row['Site ID'] || row['Site ID Problem'] || row['Site ID'] || '').trim();
             if(!siteId) return;
             let priorityRaw = (row['Priority'] || '').toString().toUpperCase();
@@ -198,12 +286,12 @@
             let status = (statusChronic.toLowerCase().includes('closed') || statusChronic.toLowerCase() === 'closed') ? 'Closed' : 'Open';
             let agingVal = parseInt(row['Occurance / Sum Issue'] || row['Occurance'] || row['Occurance / Sum Issue'] || 0);
             if(isNaN(agingVal)) agingVal = 0;
-            let problemCat = (row['RCA Grouping Auto'] || row['Problem'] || row['RCA'] || 'General Issue').trim().substring(0,60);
+            let problemCat = (row['RCA Grouping Auto'] || row['Problem'] || row['RCA'] || 'General Issue').trim().substring(0,70);
             let circle = (row['Circle'] || '').trim();
             let vendorLink = (row['Vendor Link'] || row['Vendor'] || '').trim();
             let picFinal = (row['PIC Final'] || row['Update PIC'] || row['PIC'] || 'Unassigned').trim();
             let rcaDetail = (row['Detail RCA'] || row['RCA'] || '').trim();
-            let actionFSO = (row['Action'] || row['Action FSO'] || '').trim();
+            let actionFSO = (row['Action'] || row['Action FSO'] || row['Action'] || '').trim();
             
             if(circle) circlesSet.add(circle);
             if(problemCat) categoriesSet.add(problemCat);
@@ -262,21 +350,18 @@
     }
 
     function updateCharts() {
+        // Status chart
         const open = filteredData.filter(d=>d.status==='Open').length;
         const closed = filteredData.filter(d=>d.status==='Closed').length;
         if(charts.status) charts.status.destroy();
         charts.status = new Chart(document.getElementById('statusChart'), { type:'doughnut', data:{ labels:['Open','Closed'], datasets:[{ data:[open,closed], backgroundColor:['#dc2626','#10b981'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'bottom' }, datalabels:{ color:'white', font:{weight:'bold'}, formatter:(val,ctx)=>{ let total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total?((val/total)*100).toFixed(1)+'%':''; } } } } });
         
-        const p1 = filteredData.filter(d=>d.priority==='P1').length, p2 = filteredData.filter(d=>d.priority==='P2').length;
-        if(charts.priority) charts.priority.destroy();
-        charts.priority = new Chart(document.getElementById('priorityChart'), { type:'bar', data:{ labels:['P1 (High)','P2 (Medium)'], datasets:[{ data:[p1,p2], backgroundColor:['#f97316','#6c757d'], borderRadius:6 }] }, options:{ plugins:{ datalabels:{ anchor:'end', align:'top', color:'#000', font:{weight:'bold'}, formatter:(v)=>v }, legend:{display:false} }, scales:{ y:{ beginAtZero:true } } } });
-        
-        // category chart (top 7)
+        // category chart (horizontal bar) - top 8
         let catMap = new Map();
         filteredData.forEach(d=>{ let c = d.problemCategory; catMap.set(c, (catMap.get(c)||0)+1); });
-        let sortedCat = Array.from(catMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,6);
+        let sortedCat = Array.from(catMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,7);
         if(charts.category) charts.category.destroy();
-        charts.category = new Chart(document.getElementById('categoryChart'), { type:'bar', data:{ labels:sortedCat.map(c=>c[0]), datasets:[{ data:sortedCat.map(c=>c[1]), backgroundColor:'#3b82f6' }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:true, plugins:{ datalabels:{ anchor:'end', align:'right', color:'#000', font:{weight:'bold'}, formatter:(v)=>v }, legend:{display:false} } } });
+        charts.category = new Chart(document.getElementById('categoryChart'), { type:'bar', data:{ labels:sortedCat.map(c=>c[0]), datasets:[{ data:sortedCat.map(c=>c[1]), backgroundColor:'#3b82f6', borderRadius:8 }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:true, plugins:{ datalabels:{ anchor:'end', align:'right', color:'#000', font:{weight:'bold'}, formatter:(v)=>v }, legend:{display:false} }, scales:{ x:{ beginAtZero:true } } } });
         
         // circle chart
         let circleMap = new Map();
@@ -290,7 +375,7 @@
         filteredData.forEach(d=>{ let v = d.vendor || 'Unknown'; vendorMap.set(v, (vendorMap.get(v)||0)+1); });
         let sortedVendor = Array.from(vendorMap.entries()).sort((a,b)=>b[1]-a[1]);
         if(charts.vendor) charts.vendor.destroy();
-        charts.vendor = new Chart(document.getElementById('vendorChart'), { type:'bar', data:{ labels:sortedVendor.map(v=>v[0]), datasets:[{ data:sortedVendor.map(v=>v[1]), backgroundColor:'#2c7da0' }] }, options:{ plugins:{ datalabels:{ anchor:'end', align:'top', color:'#000', formatter:(v)=>v }, legend:{display:false} } } });
+        charts.vendor = new Chart(document.getElementById('vendorChart'), { type:'bar', data:{ labels:sortedVendor.map(v=>v[0]), datasets:[{ data:sortedVendor.map(v=>v[1]), backgroundColor:'#2c7da0' }] }, options:{ plugins:{ datalabels:{ anchor:'end', align:'top', color:'#000', formatter:(v)=>v }, legend:{display:false} }, scales:{ y:{ beginAtZero:true } } } });
         
         // PIC top5
         let picMap = new Map();
@@ -305,57 +390,62 @@
         let siteMap = new Map();
         filteredData.forEach(d=>{ let s=d.siteId; if(!siteMap.has(s)) siteMap.set(s,{total:0,open:0,p1:0}); let stat = siteMap.get(s); stat.total++; if(d.status==='Open') stat.open++; if(d.priority==='P1') stat.p1++; });
         let topSites = Array.from(siteMap.entries()).map(([id,val])=> ({id, ...val})).sort((a,b)=>b.total-a.total).slice(0,8);
-        let topTbody = document.getElementById('topSitesTable');
-        topTbody.innerHTML = topSites.map(s=>`<tr><td class="site-id-mono">${s.id}</td><td class="fw-bold">${s.total}</td><td>${s.open}</td><td>${s.p1}</td></tr>`).join('');
-        if(!topSites.length) topTbody.innerHTML='<tr><td colspan="4" class="text-center">No data</td></tr>';
+        document.getElementById('topSitesTable').innerHTML = topSites.map(s=>`<tr><td class="site-id-mono">${s.id}</td><td class="fw-bold">${s.total}</td><td>${s.open}</td><td>${s.p1}</td></tr>`).join('');
+        if(!topSites.length) document.getElementById('topSitesTable').innerHTML='<tr><td colspan="4" class="text-center">No data</td></tr>';
         
-        // aging table (open issues sorted aging desc)
+        // aging open issues
         let agingOpen = filteredData.filter(d=>d.status==='Open').sort((a,b)=>b.aging - a.aging).slice(0,8);
         let agingBody = document.getElementById('agingTable');
-        agingBody.innerHTML = agingOpen.map(a=>`<tr><td class="site-id-mono">${a.siteId}</td><td class="small">${a.problemCategory.substring(0,30)}</td><td><span class="badge ${a.aging>60?'aging-critical':a.aging>30?'aging-warning':'aging-normal'}">${a.aging}d</span></td><td><span class="badge bg-danger">Open</span></td></tr>`).join('');
+        agingBody.innerHTML = agingOpen.map(a=>`<tr><td class="site-id-mono">${a.siteId}</td><td class="small">${a.problemCategory.substring(0,35)}</td><td><span class="aging-badge ${a.aging>60?'bg-danger':a.aging>30?'bg-warning':'bg-primary'} text-white">${a.aging}d</span></td><td><span class="badge bg-danger">Open</span></td></tr>`).join('');
         if(!agingOpen.length) agingBody.innerHTML='<tr><td colspan="4">No open issues</td></tr>';
         
         // vendor performance
         let vendorPerf = new Map();
         filteredData.forEach(d=>{ let v = d.vendor; if(!vendorPerf.has(v)) vendorPerf.set(v,{total:0,open:0,sumAging:0,openCount:0}); let rec = vendorPerf.get(v); rec.total++; if(d.status==='Open') { rec.open++; rec.sumAging+=d.aging; rec.openCount++; } });
         let vendorArr = Array.from(vendorPerf.entries()).map(([name,val])=>({name, total:val.total, open:val.open, avgAging: val.openCount?Math.round(val.sumAging/val.openCount):0})).sort((a,b)=>b.total-a.total);
-        let vendorBody = document.getElementById('vendorPerfTable');
-        vendorBody.innerHTML = vendorArr.map(v=>`<tr><td><strong>${v.name}</strong></td><td>${v.total}</td><td>${v.open}</td><td>${v.avgAging}d</td></tr>`).join('');
-        if(!vendorArr.length) vendorBody.innerHTML='<tr><td colspan="4">—</td></tr>';
+        document.getElementById('vendorPerfTable').innerHTML = vendorArr.map(v=>`<tr><td><strong>${v.name}</strong></td><td>${v.total}</td><td>${v.open}</td><td>${v.avgAging}d</td></tr>`).join('');
+        if(!vendorArr.length) document.getElementById('vendorPerfTable').innerHTML='<tr><td colspan="4">—</td></tr>';
     }
 
-    let sortField = 'aging', sortDir = 'desc';
     function sortBy(field) {
-        if(sortField===field) sortDir = sortDir==='asc'?'desc':'asc';
-        else { sortField=field; sortDir='desc'; }
+        if(currentSortField === field) currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+        else { currentSortField = field; currentSortDir = 'desc'; }
         renderDetailTable();
     }
+    
     function renderDetailTable() {
         let sorted = [...filteredData];
         sorted.sort((a,b)=>{
-            let aVal = a[sortField], bVal = b[sortField];
-            if(sortField==='aging') return sortDir==='asc' ? aVal-bVal : bVal-aVal;
-            if(typeof aVal === 'string') return sortDir==='asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+            let aVal = a[currentSortField], bVal = b[currentSortField];
+            if(currentSortField === 'aging') return currentSortDir === 'asc' ? aVal - bVal : bVal - aVal;
+            if(typeof aVal === 'string') return currentSortDir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
             return 0;
         });
         const tbody = document.getElementById('detailTableBody');
+        if(sorted.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4">No matching records</td></tr>';
+            document.getElementById('detailCountBadge').innerHTML = '0 rows';
+            return;
+        }
         tbody.innerHTML = sorted.map(item => `
             <tr>
-                <td class="site-id-mono">${item.siteId}</td>
-                <td>${item.problemCategory.substring(0,45)}</td>
-                <td><span class="badge ${item.priority==='P1'?'bg-danger':'bg-warning'}">${item.priority}</span></td>
-                <td><span class="badge ${item.status==='Open'?'bg-danger':'bg-success'}">${item.status}</span></td>
-                <td><span class="badge bg-secondary">${item.aging}d</span></td>
+                <td class="site-id-mono"><strong>${item.siteId}</strong></td>
+                <td style="max-width: 210px;">${item.problemCategory.substring(0,65)}${item.problemCategory.length>65?'...':''}</td>
+                <td><span class="badge ${item.priority==='P1'?'bg-danger':'bg-warning text-dark'} px-2 py-1">${item.priority}</span></td>
+                <td><span class="badge ${item.status==='Open'?'bg-danger':'bg-success'} px-2 py-1">${item.status}</span></td>
+                <td><span class="aging-badge ${item.aging>60?'bg-danger':item.aging>30?'bg-warning':'bg-info'} text-white">${item.aging} d</span></td>
                 <td>${item.pic}</td>
-                <td class="small text-truncate" style="max-width:180px;" title="${item.rootCause}">${item.rootCause.substring(0,40)}</td>
+                <td style="max-width: 210px; font-size: 12px;" title="${item.rootCause.replace(/"/g, '&quot;')}">${item.rootCause.substring(0,65)}${item.rootCause.length>65?'...':''}</td>
                 <td>${item.circle}</td>
                 <td>${item.vendor}</td>
-            </tr>
+                <td style="max-width: 180px; font-size: 12px;" title="${item.action.replace(/"/g, '&quot;')}">${item.action.substring(0,55)}${item.action.length>55?'...':''}</td>
+             </tr>
         `).join('');
         document.getElementById('detailCountBadge').innerHTML = `${filteredData.length} rows`;
     }
+    
     function showDetailTable() {
-        document.getElementById('detailTablePanel').style.display = 'flex';
+        document.getElementById('detailTablePanel').style.display = 'block';
         renderDetailTable();
     }
     function hideDetailTable() { document.getElementById('detailTablePanel').style.display = 'none'; }
@@ -369,13 +459,12 @@
     }
     function exportCSV() {
         if(!filteredData.length) return alert('No data to export');
-        let headers = ['Site ID','Priority','Status','Aging (days)','Problem Category','Circle','Vendor','PIC','Root Cause'];
-        let rows = filteredData.map(d=>[d.siteId, d.priority, d.status, d.aging, d.problemCategory, d.circle, d.vendor, d.pic, d.rootCause]);
+        let headers = ['Site ID','Priority','Status','Aging (days)','Problem Category','Circle','Vendor','PIC','Root Cause','Action'];
+        let rows = filteredData.map(d=>[d.siteId, d.priority, d.status, d.aging, d.problemCategory, d.circle, d.vendor, d.pic, d.rootCause, d.action]);
         let csvContent = [headers.join(','), ...rows.map(r=>r.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(','))].join('\n');
         const blob = new Blob([csvContent], {type:'text/csv'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `network_issues_${new Date().toISOString().slice(0,19)}.csv`; a.click(); URL.revokeObjectURL(a.href);
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `twamp_issues_${new Date().toISOString().slice(0,19)}.csv`; a.click(); URL.revokeObjectURL(a.href);
     }
-    // auto refresh every 30s
     function startAutoRefresh() { if(autoInterval) clearInterval(autoInterval); autoInterval = setInterval(()=> loadData(), 30000); }
     window.addEventListener('load', ()=>{ loadData(); startAutoRefresh(); });
 </script>
