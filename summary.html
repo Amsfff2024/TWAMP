@@ -19,13 +19,15 @@
             --accent-teal: #2ba6cb;
             --bg-light: #f4f7fc;
             --card-radius: 20px;
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
         }
         body {
             background: var(--bg-light);
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-main);
+            font-size: 14px;
             overflow-x: auto;
         }
-        /* header gradient */
         .hero-header {
             background: linear-gradient(105deg, #0b2b44 0%, #1c5d7a 100%);
             border-radius: 0 0 24px 24px;
@@ -33,6 +35,9 @@
             margin-bottom: 2rem;
             box-shadow: 0 12px 20px -12px rgba(0,0,0,0.2);
         }
+        .hero-header h1 { font-family: var(--font-heading); font-weight: 800; font-size: 1.8rem; }
+        .hero-header p { font-size: 0.85rem; opacity: 0.85; }
+        
         /* KPI cards */
         .kpi-glass {
             background: white;
@@ -43,36 +48,46 @@
             height: 100%;
         }
         .kpi-glass:hover { transform: translateY(-3px); }
-        .kpi-number { font-size: 2rem; font-weight: 800; font-family: 'Plus Jakarta Sans', monospace; letter-spacing: -0.5px; }
+        .kpi-number { font-size: 2rem; font-weight: 800; font-family: var(--font-heading); letter-spacing: -0.5px; }
+        .kpi-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; color: #6c757d; }
+        
         .filter-card {
             background: white;
             border-radius: 24px;
             border: none;
             box-shadow: 0 6px 14px rgba(0,0,0,0.03);
-            padding: 0.8rem 1.2rem;
+            padding: 1rem 1.5rem;
         }
-        .badge-p1 { background: #e11d48; color: white; font-weight: 600; padding: 4px 12px; border-radius: 40px; }
-        .badge-p2 { background: #f97316; color: white; }
-        .badge-open { background: #dc2626; color: white; }
-        .badge-closed { background: #10b981; color: white; }
-        .aging-critical { background: #b91c1c; }
-        .aging-warning { background: #f97316; }
-        .aging-normal { background: #3b82f6; }
-        .table-header-sticky th {
-            background: #1e293b;
-            color: white;
-            font-weight: 700;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            padding: 12px 8px;
+        
+        /* Badges */
+        .badge-p1 { background: #e11d48; color: white; font-weight: 600; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; }
+        .badge-p2 { background: #f97316; color: white; font-size: 0.7rem; }
+        .badge-open { background: #dc2626; color: white; font-size: 0.7rem; font-weight: 600; }
+        .badge-closed { background: #10b981; color: white; font-size: 0.7rem; }
+        .aging-badge { padding: 4px 8px; border-radius: 30px; font-weight: 600; font-size: 0.7rem; display: inline-block; }
+        
+        .chart-card { 
+            background: white; 
+            border-radius: 24px; 
+            padding: 1.2rem; 
+            height: 100%; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-        .site-id-mono { font-family: 'SF Mono', monospace; font-weight: 600; color: #075985; }
-        .chart-card { background: white; border-radius: 24px; padding: 1rem; height: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .btn-outline-custom { border-radius: 30px; padding: 6px 16px; font-weight: 500; }
+        .chart-card h6 { 
+            font-family: var(--font-heading); 
+            font-weight: 700; 
+            font-size: 1rem; 
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        
+        /* Summary Tables */
+        .summary-table-container { max-height: 280px; overflow-y: auto; }
+        .summary-table { font-size: 0.75rem; width: 100%; }
+        .summary-table th { font-size: 0.7rem; font-weight: 700; background: #f1f5f9; padding: 8px 6px; }
+        .summary-table td { font-size: 0.75rem; padding: 8px 6px; vertical-align: middle; }
+        
+        /* DETAIL TABLE - Enhanced with column filters */
         .detail-table-container { 
             background: white; 
             border-radius: 28px; 
@@ -91,19 +106,16 @@
             flex-wrap: wrap;
             gap: 12px;
         }
-        .cursor-sort { cursor: pointer; user-select: none; transition: 0.1s; }
-        .cursor-sort:hover { background-color: #2d3a4e; }
         .scroll-table { 
             max-height: 550px; 
             overflow-y: auto; 
             overflow-x: auto;
         }
-        /* Improved table font and readability */
         .detail-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
-            min-width: 1100px;
+            font-size: 0.8rem;
+            min-width: 1300px;
         }
         .detail-table th, .detail-table td {
             padding: 12px 10px;
@@ -114,38 +126,50 @@
             background: #1e293b;
             color: white;
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
             position: sticky;
             top: 0;
-            z-index: 5;
+            z-index: 10;
         }
         .detail-table td {
-            font-size: 13px;
+            font-size: 0.75rem;
             line-height: 1.4;
             color: #1f2a44;
         }
-        .detail-table .site-id-mono {
-            font-family: 'SF Mono', monospace;
-            font-weight: 700;
-            font-size: 12.5px;
+        .filter-input-cell {
+            padding: 6px 8px !important;
+            background: #f8fafc;
         }
-        .badge-sm-custom {
-            padding: 5px 10px;
-            font-size: 11px;
-            font-weight: 600;
-            border-radius: 30px;
+        .filter-input-cell input, .filter-input-cell select {
+            width: 100%;
+            padding: 5px 8px;
+            font-size: 0.7rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
         }
-        .footer-note { font-size: 11px; color: #5b6e8c; }
-        .table-responsive-wrapper {
-            overflow-x: auto;
+        .filter-input-cell input:focus, .filter-input-cell select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
         }
-        /* aging badge */
-        .aging-badge {
-            padding: 4px 8px;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 11px;
-            display: inline-block;
+        .site-id-mono { font-family: 'SF Mono', monospace; font-weight: 600; color: #075985; font-size: 0.75rem; }
+        .remark-cell { max-width: 200px; white-space: normal; word-break: break-word; font-size: 0.7rem; }
+        .sort-icon { margin-left: 4px; font-size: 0.7rem; opacity: 0.7; cursor: pointer; }
+        .cursor-sort { cursor: pointer; user-select: none; }
+        .cursor-sort:hover { background-color: #2d3a4e; }
+        
+        .footer-note { font-size: 0.7rem; color: #5b6e8c; }
+        .btn-sm-custom { font-size: 0.7rem; padding: 5px 12px; border-radius: 30px; }
+        
+        /* Chart text improvements */
+        canvas { font-family: var(--font-main); }
+        
+        @media (max-width: 768px) {
+            .kpi-number { font-size: 1.5rem; }
+            .detail-table { font-size: 0.7rem; }
         }
     </style>
 </head>
@@ -154,7 +178,7 @@
 <div class="hero-header">
     <div class="container-fluid d-flex justify-content-between align-items-center flex-wrap">
         <div>
-            <h1 class="text-white mb-0" style="font-family: 'Plus Jakarta Sans'; font-weight: 800;"><i class="fas fa-tachometer-alt me-2"></i>Twamp Dashboard</h1>
+            <h1 class="text-white mb-0"><i class="fas fa-tachometer-alt me-2"></i>Twamp Dashboard</h1>
             <p class="text-white-50 mb-0 small">Network Issue Intelligence & Resolution Tracker</p>
         </div>
         <div class="text-end">
@@ -165,48 +189,46 @@
 </div>
 
 <div class="container-fluid px-4">
-    <!-- KPI Row (6 cards) -->
+    <!-- KPI Row (5 cards) -->
     <div class="row g-3 mb-4">
-        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="d-flex justify-content-between"><span class="text-muted text-uppercase small fw-bold">Total Issues</span><i class="fas fa-chart-line text-primary opacity-50"></i></div><div class="kpi-number" id="kpiTotal">0</div><div class="small text-muted">all records</div></div></div>
-        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="d-flex justify-content-between"><span class="text-muted text-uppercase small fw-bold">Unique Sites</span><i class="fas fa-map-marker-alt text-secondary opacity-50"></i></div><div class="kpi-number" id="kpiSites">0</div><div class="small text-muted">distinct locations</div></div></div>
-        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="d-flex justify-content-between"><span class="text-muted text-uppercase small fw-bold">Open Issues</span><i class="fas fa-exclamation-triangle text-danger opacity-50"></i></div><div class="kpi-number text-danger" id="kpiOpen">0</div><div class="small text-muted">pending</div></div></div>
-        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="d-flex justify-content-between"><span class="text-muted text-uppercase small fw-bold">Closed</span><i class="fas fa-check-circle text-success opacity-50"></i></div><div class="kpi-number text-success" id="kpiClosed">0</div><div class="small text-muted">resolved</div></div></div>
-        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="d-flex justify-content-between"><span class="text-muted text-uppercase small fw-bold">High Priority (P1)</span><i class="fas fa-flag text-warning opacity-50"></i></div><div class="kpi-number text-warning" id="kpiP1">0</div><div class="small text-muted">critical impact</div></div></div>
-        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="d-flex justify-content-between"><span class="text-muted text-uppercase small fw-bold">Aging >30d</span><i class="fas fa-hourglass-half text-info opacity-50"></i></div><div class="kpi-number text-info" id="kpiAging">0</div><div class="small text-muted">long-standing issues</div></div></div>
+        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Total Issues</div><div class="kpi-number" id="kpiTotal">0</div><div class="small text-muted">all records</div></div></div>
+        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Unique Sites</div><div class="kpi-number" id="kpiSites">0</div><div class="small text-muted">distinct locations</div></div></div>
+        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Open Issues</div><div class="kpi-number text-danger" id="kpiOpen">0</div><div class="small text-muted">pending</div></div></div>
+        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Closed</div><div class="kpi-number text-success" id="kpiClosed">0</div><div class="small text-muted">resolved</div></div></div>
+        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Aging >30d</div><div class="kpi-number text-info" id="kpiAging">0</div><div class="small text-muted">long-standing</div></div></div>
     </div>
 
-    <!-- Filter Bar -->
+    <!-- Filter Bar (without priority filter) -->
     <div class="filter-card mb-4">
         <div class="row g-3 align-items-end">
             <div class="col-md-3"><label class="small fw-bold"><i class="fas fa-search"></i> Site ID</label><input type="text" id="searchSite" class="form-control form-control-sm" placeholder="e.g., 07BNS0182"></div>
             <div class="col-md-2"><label class="small fw-bold">Status</label><select id="filterStatus" class="form-select form-select-sm"><option value="">All</option><option value="Open">Open</option><option value="Closed">Closed</option></select></div>
-            <div class="col-md-2"><label class="small fw-bold">Priority</label><select id="filterPriority" class="form-select form-select-sm"><option value="">All</option><option value="P1">P1</option><option value="P2">P2</option></select></div>
             <div class="col-md-2"><label class="small fw-bold">Circle</label><select id="filterCircle" class="form-select form-select-sm"><option value="">All Circles</option></select></div>
             <div class="col-md-3"><label class="small fw-bold">Problem Category</label><select id="filterCategory" class="form-select form-select-sm"><option value="">All Categories</option></select></div>
-            <div class="col-md-12 d-flex justify-content-end gap-2 mt-2"><button class="btn btn-sm btn-outline-secondary" onclick="resetAllFilters()"><i class="fas fa-undo-alt"></i> Reset</button><button class="btn btn-sm btn-primary" onclick="showDetailTable()"><i class="fas fa-table-list"></i> Show Details</button><button class="btn btn-sm btn-outline-success" onclick="exportCSV()"><i class="fas fa-download"></i> Export</button></div>
+            <div class="col-md-2 d-flex justify-content-end gap-2 mt-2 mt-md-0"><button class="btn btn-sm btn-outline-secondary" onclick="resetAllFilters()"><i class="fas fa-undo-alt"></i> Reset</button><button class="btn btn-sm btn-primary" onclick="showDetailTable()"><i class="fas fa-table-list"></i> Show Details</button><button class="btn btn-sm btn-outline-success" onclick="exportCSV()"><i class="fas fa-download"></i> Export</button></div>
         </div>
     </div>
 
-    <!-- Charts Row (Priority chart removed) -->
+    <!-- Charts Row (Status + Category) with improved fonts -->
     <div class="row g-4 mb-4">
-        <div class="col-lg-5"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-chart-pie me-2 text-primary"></i>Status Breakdown</h6><canvas id="statusChart" height="220"></canvas></div></div>
-        <div class="col-lg-7"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-bug me-2 text-danger"></i>Top Problem Categories</h6><canvas id="categoryChart" height="220"></canvas></div></div>
+        <div class="col-lg-5"><div class="chart-card"><h6><i class="fas fa-chart-pie me-2 text-primary"></i>Status Breakdown</h6><canvas id="statusChart" height="220"></canvas></div></div>
+        <div class="col-lg-7"><div class="chart-card"><h6><i class="fas fa-bug me-2 text-danger"></i>Top Problem Categories</h6><canvas id="categoryChart" height="220"></canvas></div></div>
     </div>
-    <!-- Charts Row 2 (circle, vendor, pic) -->
+    <!-- Charts Row 2 -->
     <div class="row g-4 mb-4">
-        <div class="col-lg-4"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-globe me-2 text-info"></i>Issues by Circle</h6><canvas id="circleChart" height="200"></canvas></div></div>
-        <div class="col-lg-4"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-microchip me-2 text-secondary"></i>Vendor Analysis</h6><canvas id="vendorChart" height="200"></canvas></div></div>
-        <div class="col-lg-4"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-users me-2 text-success"></i>PIC Workload (Top 5)</h6><canvas id="picChart" height="200"></canvas></div></div>
-    </div>
-
-    <!-- Summary Tables: Top Sites + Aging List + Vendor performance -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-4"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-building me-2"></i>Top 8 Sites (by issues)</h6><div style="max-height: 280px; overflow-y: auto;"><table class="table table-sm table-hover"><thead class="table-light"><tr><th>Site ID</th><th>Total</th><th>Open</th><th>P1</th></tr></thead><tbody id="topSitesTable"><tr><td colspan="4" class="text-center">—</td></tr></tbody></table></div></div></div>
-        <div class="col-md-4"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-hourglass-start me-2"></i>Top Aging (Open Issues)</h6><div style="max-height: 280px; overflow-y: auto;"><table class="table table-sm table-hover"><thead class="table-light"><tr><th>Site ID</th><th>Category</th><th>Aging(days)</th><th>Status</th></tr></thead><tbody id="agingTable"><tr><td colspan="4" class="text-center">—</td></tr></tbody></table></div></div></div>
-        <div class="col-md-4"><div class="chart-card"><h6 class="fw-bold"><i class="fas fa-chart-line me-2"></i>Vendor Performance</h6><div style="max-height: 280px; overflow-y: auto;"><table class="table table-sm table-hover"><thead class="table-light"><tr><th>Vendor</th><th>Issues</th><th>Open</th><th>Avg Aging</th></tr></thead><tbody id="vendorPerfTable"><tr><td colspan="4" class="text-center">—</td></tr></tbody></table></div></div></div>
+        <div class="col-lg-4"><div class="chart-card"><h6><i class="fas fa-globe me-2 text-info"></i>Issues by Circle</h6><canvas id="circleChart" height="200"></canvas></div></div>
+        <div class="col-lg-4"><div class="chart-card"><h6><i class="fas fa-microchip me-2 text-secondary"></i>Vendor Analysis</h6><canvas id="vendorChart" height="200"></canvas></div></div>
+        <div class="col-lg-4"><div class="chart-card"><h6><i class="fas fa-users me-2 text-success"></i>PIC Workload (Top 5)</h6><canvas id="picChart" height="200"></canvas></div></div>
     </div>
 
-    <!-- Detailed Table Panel (Improved: header above table with row count and close button) -->
+    <!-- Summary Tables -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4"><div class="chart-card"><h6><i class="fas fa-building me-2"></i>Top 8 Sites (by issues)</h6><div class="summary-table-container"><table class="summary-table table table-sm"><thead><tr><th>Site ID</th><th>Total</th><th>Open</th><th>P1</th></tr></thead><tbody id="topSitesTable"><tr><td colspan="4" class="text-center">—</td></tr></tbody></table></div></div></div>
+        <div class="col-md-4"><div class="chart-card"><h6><i class="fas fa-hourglass-start me-2"></i>Top Aging (Open Issues)</h6><div class="summary-table-container"><table class="summary-table table table-sm"><thead><tr><th>Site ID</th><th>Category</th><th>Aging(d)</th><th>Status</th></tr></thead><tbody id="agingTable"><tr><td colspan="4" class="text-center">—</td></tr></tbody></table></div></div></div>
+        <div class="col-md-4"><div class="chart-card"><h6><i class="fas fa-chart-line me-2"></i>Vendor Performance</h6><div class="summary-table-container"><table class="summary-table table table-sm"><thead><tr><th>Vendor</th><th>Issues</th><th>Open</th><th>Avg Aging</th></tr></thead><tbody id="vendorPerfTable"><tr><td colspan="4" class="text-center">—</td></tr></tbody></table></div></div></div>
+    </div>
+
+    <!-- Detailed Table Panel with Column Filters & Sorting -->
     <div id="detailTablePanel" style="display: none;" class="detail-table-container">
         <div class="detail-header-bar">
             <div>
@@ -214,6 +236,7 @@
                 <span class="badge bg-secondary mt-1" id="detailCountBadge">0 rows</span>
             </div>
             <div>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-2" onclick="clearAllColumnFilters()"><i class="fas fa-eraser me-1"></i> Clear Filters</button>
                 <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="hideDetailTable()"><i class="fas fa-times me-1"></i> Close</button>
             </div>
         </div>
@@ -221,17 +244,29 @@
             <div class="table-responsive-wrapper">
                 <table class="detail-table" id="issuesDetailTable">
                     <thead>
+                        <tr id="filterRow">
+                            <th class="filter-input-cell"><input type="text" id="filterSiteId" placeholder="Filter Site ID" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><input type="text" id="filterProblem" placeholder="Filter Problem" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><select id="filterDetailStatus" class="form-select form-select-sm"><option value="">All Status</option><option value="Open">Open</option><option value="Closed">Closed</option></select></th>
+                            <th class="filter-input-cell"><input type="text" id="filterAging" placeholder="Min aging" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><input type="text" id="filterPIC" placeholder="Filter PIC" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><input type="text" id="filterRootCause" placeholder="Filter RCA" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><input type="text" id="filterCircleDetail" placeholder="Filter Circle" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><input type="text" id="filterVendor" placeholder="Filter Vendor" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><input type="text" id="filterAction" placeholder="Filter Action" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><input type="text" id="filterRemark" placeholder="Filter Remark" class="form-control form-control-sm"></th>
+                        </tr>
                         <tr>
-                            <th class="cursor-sort" onclick="sortBy('siteId')">Site ID <i class="fas fa-sort ms-1"></i></th>
-                            <th class="cursor-sort" onclick="sortBy('problemCategory')">Problem Category <i class="fas fa-sort ms-1"></i></th>
-                            <th class="cursor-sort" onclick="sortBy('priority')">Priority <i class="fas fa-sort ms-1"></i></th>
-                            <th class="cursor-sort" onclick="sortBy('status')">Status <i class="fas fa-sort ms-1"></i></th>
-                            <th class="cursor-sort" onclick="sortBy('aging')">Aging (days) <i class="fas fa-sort ms-1"></i></th>
-                            <th class="cursor-sort" onclick="sortBy('pic')">PIC <i class="fas fa-sort ms-1"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('siteId')">Site ID <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('problemCategory')">Problem Category <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('status')">Status <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('aging')">Aging (days) <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('pic')">PIC <i class="fas fa-sort sort-icon"></i></th>
                             <th>Root Cause / RCA</th>
-                            <th>Circle</th>
-                            <th>Vendor</th>
+                            <th class="cursor-sort" onclick="sortBy('circle')">Circle <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('vendor')">Vendor <i class="fas fa-sort sort-icon"></i></th>
                             <th>Action / Remarks</th>
+                            <th>Remark BO TX</th>
                         </tr>
                     </thead>
                     <tbody id="detailTableBody">
@@ -247,7 +282,6 @@
 
 <script>
     Chart.register(ChartDataLabels);
-    // -------- CONFIG ----------
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXDY8x_bI1a8SkNCxREGLm2yPfgFg6NB_p-Eoe09_w0e4FcG8OfNs-4jlBvT1VXH4uMp4rwHLTBry0/pub?gid=0&single=true&output=csv";
     let masterData = [];
     let filteredData = [];
@@ -267,7 +301,7 @@
             Papa.parse(csvText, { header: true, skipEmptyLines: true, complete: (results) => {
                 if(results.data && results.data.length) {
                     processRawData(results.data);
-                } else { console.warn("empty csv"); masterData = []; applyFilters(); }
+                } else { masterData = []; applyFilters(); }
                 document.getElementById('dataStatusBadge').innerHTML = '<i class="fas fa-check-circle"></i> Synced';
                 setTimeout(()=>{ document.getElementById('dataStatusBadge').innerHTML = '<i class="fas fa-cloud"></i> Live'; }, 2000);
             }});
@@ -292,6 +326,7 @@
             let picFinal = (row['PIC Final'] || row['Update PIC'] || row['PIC'] || 'Unassigned').trim();
             let rcaDetail = (row['Detail RCA'] || row['RCA'] || '').trim();
             let actionFSO = (row['Action'] || row['Action FSO'] || row['Action'] || '').trim();
+            let remarkBO = (row['Remark BO TX'] || row['Remark BO TX'] || '').trim();
             
             if(circle) circlesSet.add(circle);
             if(problemCat) categoriesSet.add(problemCat);
@@ -299,11 +334,11 @@
             dataset.push({
                 siteId, priority, status, aging: agingVal, problemCategory: problemCat || 'Undefined',
                 circle: circle || 'Unknown', vendor: vendorLink || 'N/A', pic: picFinal || '—',
-                rootCause: rcaDetail || '-', action: actionFSO || '-'
+                rootCause: rcaDetail || '-', action: actionFSO || '-', remarkBO: remarkBO || '-'
             });
         });
         masterData = dataset;
-        // populate filter dropdowns
+        
         const circleSelect = document.getElementById('filterCircle');
         circleSelect.innerHTML = '<option value="">All Circles</option>';
         Array.from(circlesSet).sort().forEach(c => { let opt = document.createElement('option'); opt.value = c; opt.innerText = c; circleSelect.appendChild(opt); });
@@ -316,14 +351,12 @@
     function applyFilters() {
         const searchTerm = document.getElementById('searchSite').value.toLowerCase();
         const statusFilter = document.getElementById('filterStatus').value;
-        const priorityFilter = document.getElementById('filterPriority').value;
         const circleFilter = document.getElementById('filterCircle').value;
         const categoryFilter = document.getElementById('filterCategory').value;
         
         filteredData = masterData.filter(item => {
             if(searchTerm && !item.siteId.toLowerCase().includes(searchTerm)) return false;
             if(statusFilter && item.status !== statusFilter) return false;
-            if(priorityFilter && item.priority !== priorityFilter) return false;
             if(circleFilter && item.circle !== circleFilter) return false;
             if(categoryFilter && item.problemCategory !== categoryFilter) return false;
             return true;
@@ -331,136 +364,188 @@
         updateKPIs();
         updateCharts();
         updateSummaryTables();
-        if(document.getElementById('detailTablePanel').style.display === 'flex') renderDetailTable();
-    }
-
-    function updateKPIs() {
-        const total = masterData.length;
-        const uniqueSites = new Set(masterData.map(d=>d.siteId)).size;
-        const openCount = filteredData.filter(d=>d.status==='Open').length;
-        const closedCount = filteredData.filter(d=>d.status==='Closed').length;
-        const p1Count = filteredData.filter(d=>d.priority==='P1').length;
-        const agingCount = filteredData.filter(d=>d.aging > 30).length;
-        document.getElementById('kpiTotal').innerText = total;
-        document.getElementById('kpiSites').innerText = uniqueSites;
-        document.getElementById('kpiOpen').innerText = openCount;
-        document.getElementById('kpiClosed').innerText = closedCount;
-        document.getElementById('kpiP1').innerText = p1Count;
-        document.getElementById('kpiAging').innerText = agingCount;
-    }
-
-    function updateCharts() {
-        // Status chart
-        const open = filteredData.filter(d=>d.status==='Open').length;
-        const closed = filteredData.filter(d=>d.status==='Closed').length;
-        if(charts.status) charts.status.destroy();
-        charts.status = new Chart(document.getElementById('statusChart'), { type:'doughnut', data:{ labels:['Open','Closed'], datasets:[{ data:[open,closed], backgroundColor:['#dc2626','#10b981'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'bottom' }, datalabels:{ color:'white', font:{weight:'bold'}, formatter:(val,ctx)=>{ let total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total?((val/total)*100).toFixed(1)+'%':''; } } } } });
-        
-        // category chart (horizontal bar) - top 8
-        let catMap = new Map();
-        filteredData.forEach(d=>{ let c = d.problemCategory; catMap.set(c, (catMap.get(c)||0)+1); });
-        let sortedCat = Array.from(catMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,7);
-        if(charts.category) charts.category.destroy();
-        charts.category = new Chart(document.getElementById('categoryChart'), { type:'bar', data:{ labels:sortedCat.map(c=>c[0]), datasets:[{ data:sortedCat.map(c=>c[1]), backgroundColor:'#3b82f6', borderRadius:8 }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:true, plugins:{ datalabels:{ anchor:'end', align:'right', color:'#000', font:{weight:'bold'}, formatter:(v)=>v }, legend:{display:false} }, scales:{ x:{ beginAtZero:true } } } });
-        
-        // circle chart
-        let circleMap = new Map();
-        filteredData.forEach(d=>{ let cir = d.circle; circleMap.set(cir, (circleMap.get(cir)||0)+1); });
-        let sortedCircle = Array.from(circleMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,5);
-        if(charts.circle) charts.circle.destroy();
-        charts.circle = new Chart(document.getElementById('circleChart'), { type:'pie', data:{ labels:sortedCircle.map(c=>c[0]), datasets:[{ data:sortedCircle.map(c=>c[1]), backgroundColor:['#0ea5e9','#8b5cf6','#f59e0b','#ef4444','#10b981'] }] }, options:{ plugins:{ datalabels:{ color:'white', formatter:(val,ctx)=>{ let total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total?((val/total)*100).toFixed(1)+'%':''; } }, legend:{ position:'right' } } } });
-        
-        // vendor chart
-        let vendorMap = new Map();
-        filteredData.forEach(d=>{ let v = d.vendor || 'Unknown'; vendorMap.set(v, (vendorMap.get(v)||0)+1); });
-        let sortedVendor = Array.from(vendorMap.entries()).sort((a,b)=>b[1]-a[1]);
-        if(charts.vendor) charts.vendor.destroy();
-        charts.vendor = new Chart(document.getElementById('vendorChart'), { type:'bar', data:{ labels:sortedVendor.map(v=>v[0]), datasets:[{ data:sortedVendor.map(v=>v[1]), backgroundColor:'#2c7da0' }] }, options:{ plugins:{ datalabels:{ anchor:'end', align:'top', color:'#000', formatter:(v)=>v }, legend:{display:false} }, scales:{ y:{ beginAtZero:true } } } });
-        
-        // PIC top5
-        let picMap = new Map();
-        filteredData.forEach(d=>{ let p = d.pic; if(p && p!=='—') picMap.set(p, (picMap.get(p)||0)+1); });
-        let topPics = Array.from(picMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,5);
-        if(charts.pic) charts.pic.destroy();
-        charts.pic = new Chart(document.getElementById('picChart'), { type:'pie', data:{ labels:topPics.map(p=>p[0]), datasets:[{ data:topPics.map(p=>p[1]), backgroundColor:['#9b59b6','#3498db','#e67e22','#2ecc71','#e74c3c'] }] }, options:{ plugins:{ datalabels:{ color:'white', formatter:(val,ctx)=>{ let total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total?((val/total)*100).toFixed(0)+'%':''; } }, legend:{ position:'right' } } } });
-    }
-
-    function updateSummaryTables() {
-        // top sites
-        let siteMap = new Map();
-        filteredData.forEach(d=>{ let s=d.siteId; if(!siteMap.has(s)) siteMap.set(s,{total:0,open:0,p1:0}); let stat = siteMap.get(s); stat.total++; if(d.status==='Open') stat.open++; if(d.priority==='P1') stat.p1++; });
-        let topSites = Array.from(siteMap.entries()).map(([id,val])=> ({id, ...val})).sort((a,b)=>b.total-a.total).slice(0,8);
-        document.getElementById('topSitesTable').innerHTML = topSites.map(s=>`<tr><td class="site-id-mono">${s.id}</td><td class="fw-bold">${s.total}</td><td>${s.open}</td><td>${s.p1}</td></tr>`).join('');
-        if(!topSites.length) document.getElementById('topSitesTable').innerHTML='<tr><td colspan="4" class="text-center">No data</td></tr>';
-        
-        // aging open issues
-        let agingOpen = filteredData.filter(d=>d.status==='Open').sort((a,b)=>b.aging - a.aging).slice(0,8);
-        let agingBody = document.getElementById('agingTable');
-        agingBody.innerHTML = agingOpen.map(a=>`<tr><td class="site-id-mono">${a.siteId}</td><td class="small">${a.problemCategory.substring(0,35)}</td><td><span class="aging-badge ${a.aging>60?'bg-danger':a.aging>30?'bg-warning':'bg-primary'} text-white">${a.aging}d</span></td><td><span class="badge bg-danger">Open</span></td></tr>`).join('');
-        if(!agingOpen.length) agingBody.innerHTML='<tr><td colspan="4">No open issues</td></tr>';
-        
-        // vendor performance
-        let vendorPerf = new Map();
-        filteredData.forEach(d=>{ let v = d.vendor; if(!vendorPerf.has(v)) vendorPerf.set(v,{total:0,open:0,sumAging:0,openCount:0}); let rec = vendorPerf.get(v); rec.total++; if(d.status==='Open') { rec.open++; rec.sumAging+=d.aging; rec.openCount++; } });
-        let vendorArr = Array.from(vendorPerf.entries()).map(([name,val])=>({name, total:val.total, open:val.open, avgAging: val.openCount?Math.round(val.sumAging/val.openCount):0})).sort((a,b)=>b.total-a.total);
-        document.getElementById('vendorPerfTable').innerHTML = vendorArr.map(v=>`<tr><td><strong>${v.name}</strong></td><td>${v.total}</td><td>${v.open}</td><td>${v.avgAging}d</td></tr>`).join('');
-        if(!vendorArr.length) document.getElementById('vendorPerfTable').innerHTML='<tr><td colspan="4">—</td></tr>';
-    }
-
-    function sortBy(field) {
-        if(currentSortField === field) currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
-        else { currentSortField = field; currentSortDir = 'desc'; }
-        renderDetailTable();
+        if(document.getElementById('detailTablePanel').style.display === 'block') {
+            applyDetailFilters();
+        }
     }
     
-    function renderDetailTable() {
-        let sorted = [...filteredData];
-        sorted.sort((a,b)=>{
+    // Apply column filters on detailed data
+    function applyDetailFilters() {
+        let detailFiltered = [...filteredData];
+        const filterSite = document.getElementById('filterSiteId')?.value.toLowerCase() || '';
+        const filterProb = document.getElementById('filterProblem')?.value.toLowerCase() || '';
+        const filterStat = document.getElementById('filterDetailStatus')?.value || '';
+        const filterAgingMin = parseInt(document.getElementById('filterAging')?.value) || 0;
+        const filterPic = document.getElementById('filterPIC')?.value.toLowerCase() || '';
+        const filterRca = document.getElementById('filterRootCause')?.value.toLowerCase() || '';
+        const filterCircleDet = document.getElementById('filterCircleDetail')?.value.toLowerCase() || '';
+        const filterVendor = document.getElementById('filterVendor')?.value.toLowerCase() || '';
+        const filterAction = document.getElementById('filterAction')?.value.toLowerCase() || '';
+        const filterRemark = document.getElementById('filterRemark')?.value.toLowerCase() || '';
+        
+        detailFiltered = detailFiltered.filter(item => {
+            if(filterSite && !item.siteId.toLowerCase().includes(filterSite)) return false;
+            if(filterProb && !item.problemCategory.toLowerCase().includes(filterProb)) return false;
+            if(filterStat && item.status !== filterStat) return false;
+            if(filterAgingMin > 0 && item.aging < filterAgingMin) return false;
+            if(filterPic && !item.pic.toLowerCase().includes(filterPic)) return false;
+            if(filterRca && !item.rootCause.toLowerCase().includes(filterRca)) return false;
+            if(filterCircleDet && !item.circle.toLowerCase().includes(filterCircleDet)) return false;
+            if(filterVendor && !item.vendor.toLowerCase().includes(filterVendor)) return false;
+            if(filterAction && !item.action.toLowerCase().includes(filterAction)) return false;
+            if(filterRemark && !item.remarkBO.toLowerCase().includes(filterRemark)) return false;
+            return true;
+        });
+        
+        // Apply sorting
+        detailFiltered.sort((a,b)=>{
             let aVal = a[currentSortField], bVal = b[currentSortField];
             if(currentSortField === 'aging') return currentSortDir === 'asc' ? aVal - bVal : bVal - aVal;
             if(typeof aVal === 'string') return currentSortDir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
             return 0;
         });
+        renderDetailTableBody(detailFiltered);
+        document.getElementById('detailCountBadge').innerHTML = `${detailFiltered.length} rows`;
+    }
+    
+    function clearAllColumnFilters() {
+        document.getElementById('filterSiteId').value = '';
+        document.getElementById('filterProblem').value = '';
+        document.getElementById('filterDetailStatus').value = '';
+        document.getElementById('filterAging').value = '';
+        document.getElementById('filterPIC').value = '';
+        document.getElementById('filterRootCause').value = '';
+        document.getElementById('filterCircleDetail').value = '';
+        document.getElementById('filterVendor').value = '';
+        document.getElementById('filterAction').value = '';
+        document.getElementById('filterRemark').value = '';
+        applyDetailFilters();
+    }
+    
+    function renderDetailTableBody(data) {
         const tbody = document.getElementById('detailTableBody');
-        if(sorted.length === 0) {
+        if(!data.length) {
             tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4">No matching records</td></tr>';
-            document.getElementById('detailCountBadge').innerHTML = '0 rows';
             return;
         }
-        tbody.innerHTML = sorted.map(item => `
+        tbody.innerHTML = data.map(item => `
             <tr>
-                <td class="site-id-mono"><strong>${item.siteId}</strong></td>
-                <td style="max-width: 210px;">${item.problemCategory.substring(0,65)}${item.problemCategory.length>65?'...':''}</td>
-                <td><span class="badge ${item.priority==='P1'?'bg-danger':'bg-warning text-dark'} px-2 py-1">${item.priority}</span></td>
-                <td><span class="badge ${item.status==='Open'?'bg-danger':'bg-success'} px-2 py-1">${item.status}</span></td>
-                <td><span class="aging-badge ${item.aging>60?'bg-danger':item.aging>30?'bg-warning':'bg-info'} text-white">${item.aging} d</span></td>
-                <td>${item.pic}</td>
-                <td style="max-width: 210px; font-size: 12px;" title="${item.rootCause.replace(/"/g, '&quot;')}">${item.rootCause.substring(0,65)}${item.rootCause.length>65?'...':''}</td>
-                <td>${item.circle}</td>
-                <td>${item.vendor}</td>
-                <td style="max-width: 180px; font-size: 12px;" title="${item.action.replace(/"/g, '&quot;')}">${item.action.substring(0,55)}${item.action.length>55?'...':''}</td>
-             </tr>
+                <td class="site-id-mono"><strong>${escapeHtml(item.siteId)}</strong></td>
+                <td style="max-width: 210px;">${escapeHtml(item.problemCategory.substring(0,65))}${item.problemCategory.length>65?'...':''}</td>
+                <td><span class="badge ${item.status==='Open'?'badge-open':'badge-closed'}">${escapeHtml(item.status)}</span></td>
+                <td><span class="aging-badge ${item.aging>60?'bg-danger':item.aging>30?'bg-warning text-dark':'bg-info'} text-white">${item.aging} d</span></td>
+                <td>${escapeHtml(item.pic)}</td>
+                <td style="max-width: 210px; font-size: 0.7rem;" title="${escapeHtml(item.rootCause)}">${escapeHtml(item.rootCause.substring(0,65))}${item.rootCause.length>65?'...':''}</td>
+                <td>${escapeHtml(item.circle)}</td>
+                <td>${escapeHtml(item.vendor)}</td>
+                <td style="max-width: 180px; font-size: 0.7rem;" title="${escapeHtml(item.action)}">${escapeHtml(item.action.substring(0,55))}${item.action.length>55?'...':''}</td>
+                <td class="remark-cell" style="max-width: 200px; font-size: 0.7rem;" title="${escapeHtml(item.remarkBO)}">${escapeHtml(item.remarkBO.substring(0,60))}${item.remarkBO.length>60?'...':''}</td>
+            </tr>
         `).join('');
-        document.getElementById('detailCountBadge').innerHTML = `${filteredData.length} rows`;
     }
+    
+    function sortBy(field) {
+        if(currentSortField === field) currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+        else { currentSortField = field; currentSortDir = 'desc'; }
+        applyDetailFilters();
+    }
+    
+    function updateKPIs() {
+        document.getElementById('kpiTotal').innerText = masterData.length;
+        document.getElementById('kpiSites').innerText = new Set(masterData.map(d=>d.siteId)).size;
+        document.getElementById('kpiOpen').innerText = filteredData.filter(d=>d.status==='Open').length;
+        document.getElementById('kpiClosed').innerText = filteredData.filter(d=>d.status==='Closed').length;
+        document.getElementById('kpiAging').innerText = filteredData.filter(d=>d.aging > 30).length;
+    }
+
+    function updateCharts() {
+        const open = filteredData.filter(d=>d.status==='Open').length;
+        const closed = filteredData.filter(d=>d.status==='Closed').length;
+        if(charts.status) charts.status.destroy();
+        charts.status = new Chart(document.getElementById('statusChart'), { type:'doughnut', data:{ labels:['Open','Closed'], datasets:[{ data:[open,closed], backgroundColor:['#dc2626','#10b981'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'bottom', labels:{ font:{ size:11, family:"'Inter', sans-serif" } } }, datalabels:{ color:'white', font:{ weight:'bold', size:12 }, formatter:(val,ctx)=>{ let total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total?((val/total)*100).toFixed(1)+'%':''; } } } } });
+        
+        let catMap = new Map();
+        filteredData.forEach(d=>{ let c = d.problemCategory; catMap.set(c, (catMap.get(c)||0)+1); });
+        let sortedCat = Array.from(catMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,7);
+        if(charts.category) charts.category.destroy();
+        charts.category = new Chart(document.getElementById('categoryChart'), { type:'bar', data:{ labels:sortedCat.map(c=>c[0]), datasets:[{ data:sortedCat.map(c=>c[1]), backgroundColor:'#3b82f6', borderRadius:8 }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:true, plugins:{ datalabels:{ anchor:'end', align:'right', color:'#000', font:{ weight:'bold', size:11 }, formatter:(v)=>v }, legend:{display:false} }, scales:{ x:{ beginAtZero:true, ticks:{ font:{ size:10 } } }, y:{ ticks:{ font:{ size:10 } } } } } });
+        
+        let circleMap = new Map();
+        filteredData.forEach(d=>{ let cir = d.circle; circleMap.set(cir, (circleMap.get(cir)||0)+1); });
+        let sortedCircle = Array.from(circleMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,5);
+        if(charts.circle) charts.circle.destroy();
+        charts.circle = new Chart(document.getElementById('circleChart'), { type:'pie', data:{ labels:sortedCircle.map(c=>c[0]), datasets:[{ data:sortedCircle.map(c=>c[1]), backgroundColor:['#0ea5e9','#8b5cf6','#f59e0b','#ef4444','#10b981'] }] }, options:{ plugins:{ datalabels:{ color:'white', font:{ size:11, weight:'bold' }, formatter:(val,ctx)=>{ let total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total?((val/total)*100).toFixed(1)+'%':''; } }, legend:{ position:'right', labels:{ font:{ size:10 } } } } } });
+        
+        let vendorMap = new Map();
+        filteredData.forEach(d=>{ let v = d.vendor || 'Unknown'; vendorMap.set(v, (vendorMap.get(v)||0)+1); });
+        let sortedVendor = Array.from(vendorMap.entries()).sort((a,b)=>b[1]-a[1]);
+        if(charts.vendor) charts.vendor.destroy();
+        charts.vendor = new Chart(document.getElementById('vendorChart'), { type:'bar', data:{ labels:sortedVendor.map(v=>v[0]), datasets:[{ data:sortedVendor.map(v=>v[1]), backgroundColor:'#2c7da0' }] }, options:{ plugins:{ datalabels:{ anchor:'end', align:'top', color:'#000', font:{ size:11, weight:'bold' }, formatter:(v)=>v }, legend:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:10 } } }, x:{ ticks:{ font:{ size:10 } } } } } });
+        
+        let picMap = new Map();
+        filteredData.forEach(d=>{ let p = d.pic; if(p && p!=='—') picMap.set(p, (picMap.get(p)||0)+1); });
+        let topPics = Array.from(picMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,5);
+        if(charts.pic) charts.pic.destroy();
+        charts.pic = new Chart(document.getElementById('picChart'), { type:'pie', data:{ labels:topPics.map(p=>p[0]), datasets:[{ data:topPics.map(p=>p[1]), backgroundColor:['#9b59b6','#3498db','#e67e22','#2ecc71','#e74c3c'] }] }, options:{ plugins:{ datalabels:{ color:'white', font:{ size:11, weight:'bold' }, formatter:(val,ctx)=>{ let total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total?((val/total)*100).toFixed(0)+'%':''; } }, legend:{ position:'right', labels:{ font:{ size:10 } } } } } });
+    }
+
+    function updateSummaryTables() {
+        let siteMap = new Map();
+        filteredData.forEach(d=>{ let s=d.siteId; if(!siteMap.has(s)) siteMap.set(s,{total:0,open:0,p1:0}); let stat = siteMap.get(s); stat.total++; if(d.status==='Open') stat.open++; if(d.priority==='P1') stat.p1++; });
+        let topSites = Array.from(siteMap.entries()).map(([id,val])=> ({id, ...val})).sort((a,b)=>b.total-a.total).slice(0,8);
+        document.getElementById('topSitesTable').innerHTML = topSites.map(s=>`<tr><td class="site-id-mono">${escapeHtml(s.id)}</td><td class="fw-bold">${s.total}</td><td>${s.open}</td><td>${s.p1}</td></tr>`).join('') || '<tr><td colspan="4" class="text-center">No data</td></tr>';
+        
+        let agingOpen = filteredData.filter(d=>d.status==='Open').sort((a,b)=>b.aging - a.aging).slice(0,8);
+        document.getElementById('agingTable').innerHTML = agingOpen.map(a=>`<tr><td class="site-id-mono">${escapeHtml(a.siteId)}</td><td class="small">${escapeHtml(a.problemCategory.substring(0,35))}</td><td><span class="aging-badge ${a.aging>60?'bg-danger':a.aging>30?'bg-warning':'bg-primary'} text-white">${a.aging}d</span></td><td><span class="badge badge-open">Open</span></td></tr>`).join('') || '<tr><td colspan="4">No open issues</td></tr>';
+        
+        let vendorPerf = new Map();
+        filteredData.forEach(d=>{ let v = d.vendor; if(!vendorPerf.has(v)) vendorPerf.set(v,{total:0,open:0,sumAging:0,openCount:0}); let rec = vendorPerf.get(v); rec.total++; if(d.status==='Open') { rec.open++; rec.sumAging+=d.aging; rec.openCount++; } });
+        let vendorArr = Array.from(vendorPerf.entries()).map(([name,val])=>({name, total:val.total, open:val.open, avgAging: val.openCount?Math.round(val.sumAging/val.openCount):0})).sort((a,b)=>b.total-a.total);
+        document.getElementById('vendorPerfTable').innerHTML = vendorArr.map(v=>`<tr><td><strong>${escapeHtml(v.name)}</strong></td><td>${v.total}</td><td>${v.open}</td><td>${v.avgAging}d</td></tr>`).join('') || '<tr><td colspan="4">—</td></tr>';
+    }
+    
+    function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>]/g, function(m){ if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m; }); }
     
     function showDetailTable() {
         document.getElementById('detailTablePanel').style.display = 'block';
-        renderDetailTable();
+        // attach event listeners to column filters
+        const filterIds = ['filterSiteId','filterProblem','filterDetailStatus','filterAging','filterPIC','filterRootCause','filterCircleDetail','filterVendor','filterAction','filterRemark'];
+        filterIds.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.removeEventListener('input', applyDetailFilters);
+            if(el) el.removeEventListener('change', applyDetailFilters);
+            if(el && (el.tagName === 'INPUT' || el.tagName === 'SELECT')) {
+                el.addEventListener('input', applyDetailFilters);
+                el.addEventListener('change', applyDetailFilters);
+            }
+        });
+        applyDetailFilters();
     }
     function hideDetailTable() { document.getElementById('detailTablePanel').style.display = 'none'; }
     function resetAllFilters() {
         document.getElementById('searchSite').value='';
         document.getElementById('filterStatus').value='';
-        document.getElementById('filterPriority').value='';
         document.getElementById('filterCircle').value='';
         document.getElementById('filterCategory').value='';
         applyFilters();
     }
     function exportCSV() {
-        if(!filteredData.length) return alert('No data to export');
-        let headers = ['Site ID','Priority','Status','Aging (days)','Problem Category','Circle','Vendor','PIC','Root Cause','Action'];
-        let rows = filteredData.map(d=>[d.siteId, d.priority, d.status, d.aging, d.problemCategory, d.circle, d.vendor, d.pic, d.rootCause, d.action]);
+        let exportData = [...filteredData];
+        const filterSite = document.getElementById('filterSiteId')?.value;
+        if(document.getElementById('detailTablePanel').style.display === 'block' && filterSite !== undefined) {
+            exportData = [];
+            applyDetailFilters(); // recalc filtered detail
+        }
+        let dataToExport = filteredData;
+        if(document.getElementById('detailTablePanel').style.display === 'block') {
+            let temp = [...filteredData];
+            const fSite = document.getElementById('filterSiteId')?.value.toLowerCase() || '';
+            if(fSite) temp = temp.filter(i=>i.siteId.toLowerCase().includes(fSite));
+            dataToExport = temp;
+        }
+        if(!dataToExport.length) return alert('No data to export');
+        let headers = ['Site ID','Status','Aging (days)','Problem Category','Circle','Vendor','PIC','Root Cause','Action','Remark BO TX'];
+        let rows = dataToExport.map(d=>[d.siteId, d.status, d.aging, d.problemCategory, d.circle, d.vendor, d.pic, d.rootCause, d.action, d.remarkBO]);
         let csvContent = [headers.join(','), ...rows.map(r=>r.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(','))].join('\n');
         const blob = new Blob([csvContent], {type:'text/csv'});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `twamp_issues_${new Date().toISOString().slice(0,19)}.csv`; a.click(); URL.revokeObjectURL(a.href);
