@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Twamp Dashboard - Network Issue Tracker + FME Quadrant Analysis</title>
+    <!-- Bootstrap 5 + Icons + Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- PapaParse, Chart.js + datalabels + annotation -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        :root {
+            --primary-deep: #0f2b4d;
+            --accent-teal: #2ba6cb;
+            --bg-light: #f4f7fc;
+            --card-radius: 20px;
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+        }
+        body {
+            background: var(--bg-light);
+            font-family: var(--font-main);
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        .hero-header {
+            background: linear-gradient(105deg, #0b2b44 0%, #1c5d7a 100%);
+            border-radius: 0 0 24px 24px;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 12px 20px -12px rgba(0,0,0,0.2);
+        }
+        .hero-header h1 { font-family: var(--font-heading); font-weight: 800; font-size: 1.8rem; }
+        .hero-header p { font-size: 0.85rem; opacity: 0.85; }
+        
+        /* KPI cards */
+        .kpi-glass {
+            background: white;
+            border-radius: var(--card-radius);
+            border: none;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            height: 100%;
+        }
+        .kpi-glass:hover { transform: translateY(-3px); }
+        .kpi-number { font-size: 2rem; font-weight: 800; font-family: var(--font-heading); letter-spacing: -0.5px; }
+        .kpi-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; color: #6c757d; }
+        
+        .filter-card {
+            background: white;
+            border-radius: 24px;
+            border: none;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.03);
+            padding: 1rem 1.5rem;
+        }
+        
+        /* Badges */
+        .badge-p1 { background: #e11d48; color: white; font-weight: 600; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; }
+        .badge-p2 { background: #f97316; color: white; font-size: 0.7rem; }
+        .badge-open { background: #dc2626; color: white; font-size: 0.7rem; font-weight: 600; }
+        .badge-closed { background: #10b981; color: white; font-size: 0.7rem; }
+        .aging-badge { padding: 4px 8px; border-radius: 30px; font-weight: 600; font-size: 0.7rem; display: inline-block; }
+        
+        .chart-card { 
+            background: white; 
+            border-radius: 24px; 
+            padding: 1.2rem; 
+            height: 100%; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .chart-card h6 { 
+            font-family: var(--font-heading); 
+            font-weight: 700; 
+            font-size: 1rem; 
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        
+        /* Summary Tables */
+        .summary-table-container { max-height: 280px; overflow-y: auto; }
+        .summary-table { font-size: 0.75rem; width: 100%; }
+        .summary-table th { font-size: 0.7rem; font-weight: 700; background: #f1f5f9; padding: 8px 6px; }
+        .summary-table td { font-size: 0.75rem; padding: 8px 6px; vertical-align: middle; }
+        
+        /* DETAIL TABLE - Enhanced with column filters */
+        .detail-table-container { 
+            background: white; 
+            border-radius: 28px; 
+            overflow: hidden; 
+            box-shadow: 0 12px 28px rgba(0,0,0,0.08); 
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+        }
+        .detail-header-bar {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .scroll-table { 
+            max-height: 550px; 
+            overflow-y: auto; 
+            overflow-x: auto;
+        }
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            min-width: 1300px;
+        }
+        .detail-table th, .detail-table td {
+            padding: 12px 10px;
+            vertical-align: middle;
+            border-bottom: 1px solid #eef2f6;
+        }
+        .detail-table th {
+            background: #1e293b;
+            color: white;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .detail-table td {
+            font-size: 0.75rem;
+            line-height: 1.4;
+            color: #1f2a44;
+        }
+        .filter-input-cell {
+            padding: 6px 8px !important;
+            background: #f8fafc;
+        }
+        .filter-input-cell input, .filter-input-cell select {
+            width: 100%;
+            padding: 5px 8px;
+            font-size: 0.7rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+        }
+        .filter-input-cell input:focus, .filter-input-cell select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
+        }
+        .site-id-mono { font-family: 'SF Mono', monospace; font-weight: 600; color: #075985; font-size: 0.75rem; }
+        .remark-cell { max-width: 200px; white-space: normal; word-break: break-word; font-size: 0.7rem; }
+        .sort-icon { margin-left: 4px; font-size: 0.7rem; opacity: 0.7; cursor: pointer; }
+        .cursor-sort { cursor: pointer; user-select: none; }
+        .cursor-sort:hover { background-color: #2d3a4e; }
+        
+        .footer-note { font-size: 0.7rem; color: #5b6e8c; }
+        .btn-sm-custom { font-size: 0.7rem; padding: 5px 12px; border-radius: 30px; }
+        
+        /* Quadrant specific styles */
+        .quadrant-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 12px;
+        }
+        .quadrant-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        
+        canvas { font-family: var(--font-main); }
+        
+        @media (max-width: 768px) {
+            .kpi-number { font-size: 1.5rem; }
+            .detail-table { font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero-header">
+    <div class="container-fluid d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <h1 class="text-white mb-0"><i class="fas fa-tachometer-alt me-2"></i>Twamp Dashboard</h1>
+            <p class="text-white-50 mb-0 small">Network Issue Intelligence & FME Copilot Quadrant Analysis</p>
+        </div>
+        <div class="text-end">
+            <span class="badge bg-light text-dark px-3 py-2 rounded-pill"><i class="far fa-clock me-1"></i> <span id="liveClock">--:--:--</span></span>
+            <span class="badge bg-dark ms-2 px-3 py-2 rounded-pill" id="dataStatusBadge"><i class="fas fa-sync-alt fa-fw"></i> Loading</span>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-4">
+    <!-- KPI Row (5 cards) -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Total Issues</div><div class="kpi-number" id="kpiTotal">0</div><div class="small text-muted">all records</div></div></div>
+        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Unique Sites</div><div class="kpi-number" id="kpiSites">0</div><div class="small text-muted">distinct locations</div></div></div>
+        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Open Issues</div><div class="kpi-number text-danger" id="kpiOpen">0</div><div class="small text-muted">pending</div></div></div>
+        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Closed</div><div class="kpi-number text-success" id="kpiClosed">0</div><div class="small text-muted">resolved</div></div></div>
+        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Aging >30d</div><div class="kpi-number text-info" id="kpiAging">0</div><div class="small text-muted">long-standing</div></div></div>
+    </div>
+
+    <!-- NEW: FME Quadrant Chart Section -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="chart-card">
+                <h6><i class="fas fa-chart-pie me-2 text-primary"></i>FME Copilot Quadrant Analysis</h6>
+                <p class="small text-muted mb-2">Analisis berdasarkan Usage Rate vs Success Rate Remark</p>
+                <div class="quadrant-legend mb-3">
+                    <span><span class="quadrant-dot" style="background: #ff6b6b;"></span>🔴 Critical (Low Usage, Low Success)</span>
+                    <span><span class="quadrant-dot" style="background: #ffd93d;"></span>🟡 Need Attention (High Usage, Low Success)</span>
+                    <span><span class="quadrant-dot" style="background: #6bcb77;"></span>🟢 Good (High Usage, High Success)</span>
+                    <span><span class="quadrant-dot" style="background: #4d96ff;"></span>🔵 Potential (Low Usage, High Success)</span>
+                </div>
+                <div style="position: relative; height: 450px;">
+                    <canvas id="fmeQuadrantChart"></canvas>
+                </div>
+                <div class="row mt-3" id="quadrantStats">
+                    <div class="col-md-3 col-6 text-center"><small class="text-muted">Critical</small><br><strong id="statCritical">0</strong></div>
+                    <div class="col-md-3 col-6 text-center"><small class="text-muted">Need Attention</small><br><strong id="statNeedAttention">0</strong></div>
+                    <div class="col-md-3 col-6 text-center"><small class="text-muted">Good</small><br><strong id="statGood">0</strong></div>
+                    <div class="col-md-3 col-6 text-center"><small class="text-muted">Potential</small><br><strong id="statPotential">0</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-card mb-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3"><label class="small fw-bold"><i class="fas fa-search"></i> Site ID</label><input type="text" id="searchSite" class="form-control form-control-sm" placeholder="e.g., 07BNS0182"></div>
+            <div class="col-md-2"><label class="small fw-bold">Status</label><select id="filterStatus" class="form-select form-select-sm"><option value="">All</option><option value="Open">Open</option><option value="Closed">Closed</option></select></div>
+            <div class="col-md-2"><label class="small fw-bold">Circle</label><select id="filterCircle" class="form-select form-select-sm"><option value="">All Circles</option></select></div>
+            <div class="col-md-3"><label class="small fw-bold">Problem Category</label><select id="filterCategory" class="form-select form-select-sm"><option value="">All Categories</option></select></div>
+            <div class="col-md-2 d-flex justify-content-end gap-2 mt-2 mt-md-0"><button class="btn btn-sm btn-outline-secondary" onclick="resetAllFilters()"><i class="fas fa-undo-alt"></i> Reset</button><button class="btn btn-sm btn-primary" onclick="showDetailTable()"><i class="fas fa-table-list"></i> Show Details</button><button class="btn btn-sm btn-outline-success" onclick="exportCSV()"><i class="fas fa-download"></i> Export</button></div>
+        </div>
+    </div>
+
+    <!-- Charts Row (Status + Category) -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-5"><div class="chart-card"><h6><i class="fas fa-chart-pie me-2 text-primary"></i>Status Breakdown</h6><canvas id="statusChart" height="220"></canvas></div></div>
+        <div class="col-lg-7"><div class="chart-card"><h6><i class="fas fa-bug me-2 text-danger"></i>Top Problem Categories</h6><canvas id="categoryChart" height="220"></canvas></div></div>
+    </div>
+    <!-- Charts Row 2 -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-4"><div class="chart-card"><h6><i class="fas fa-globe me-2 text-info"></i>Issues by Circle</h6><canvas id="circleChart" height="200"></canvas></div></div>
+        <div class="col-lg-4"><div class="chart-card"><h6><i class="fas fa-microchip me-2 text-secondary"></i>Vendor Analysis</h6><canvas id="vendorChart" height="200"></canvas></div></div>
+        <div class="col-lg-4"><div class="chart-card"><h6><i class="fas fa-users me-2 text-success"></i>PIC Workload (Top 5)</h6><canvas id="picChart" height="200"></canvas></div></div>
+    </div>
+
+    <!-- Summary Tables -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4"><div class="chart-card"><h6><i class="fas fa-building me-2"></i>Top 8 Sites (by issues)</h6><div class="summary-table-container"><table class="summary-table table table-sm"><thead><tr><th>Site ID</th><th>Total</th><th>Open</th><th>P1</th></tr></thead><tbody id="topSitesTable"><tr><td colspan="4" class="text-center">—</td></tr></tbody></table></div></div></div>
+        <div class="col-md-4"><div class="chart-card"><h6><i class="fas fa-hourglass-start me-2"></i>Top Aging (Open Issues)</h6><div class="summary-table-container"><table class="summary-table table table-sm"><thead><tr><th>Site ID</th><th>Category</th><th>Aging(d)</th><th>Status</th></tr></thead><tbody id="agingTable"><tr><td colspan="4" class="text-center">—</td></tr></tbody></table></div></div></div>
+        <div class="col-md-4"><div class="chart-card"><h6><i class="fas fa-chart-line me-2"></i>Vendor Performance</h6><div class="summary-table-container"><table class="summary-table table table-sm"><thead><tr><th>Vendor</th><th>Issues</th><th>Open</th><th>Avg Aging</th></tr></thead><tbody id="vendorPerfTable"><tr><td colspan="4" class="text-center">—</td></tr></tbody></table></div></div></div>
+    </div>
+
+    <!-- Detailed Table Panel -->
+    <div id="detailTablePanel" style="display: none;" class="detail-table-container">
+        <div class="detail-header-bar">
+            <div>
+                <h5 class="mb-0 fw-bold"><i class="fas fa-rectangle-list me-2 text-primary"></i>Issue Details</h5>
+                <span class="badge bg-secondary mt-1" id="detailCountBadge">0 rows</span>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-2" onclick="clearAllColumnFilters()"><i class="fas fa-eraser me-1"></i> Clear Filters</button>
+                <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="hideDetailTable()"><i class="fas fa-times me-1"></i> Close</button>
+            </div>
+        </div>
+        <div class="scroll-table">
+            <div class="table-responsive-wrapper">
+                <table class="detail-table" id="issuesDetailTable">
+                    <thead>
+                        <tr id="filterRow">
+                            <th class="filter-input-cell"><input type="text" id="filterSiteId" placeholder="Filter Site ID" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><input type="text" id="filterProblem" placeholder="Filter Problem" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><select id="filterDetailStatus" class="form-select form-select-sm"><option value="">All Status</option><option value="Open">Open</option><option value="Closed">Closed</option></select></th>
+                            <th class="filter-input-cell"><input type="text" id="filterAging" placeholder="Min aging" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><input type="text" id="filterPIC" placeholder="Filter PIC" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><input type="text" id="filterRootCause" placeholder="Filter RCA" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><input type="text" id="filterCircleDetail" placeholder="Filter Circle" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><input type="text" id="filterVendor" placeholder="Filter Vendor" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><input type="text" id="filterAction" placeholder="Filter Action" class="form-control form-control-sm"></th>
+                            <th class="filter-input-cell"><input type="text" id="filterRemark" placeholder="Filter Remark" class="form-control form-control-sm"></th>
+                        </tr>
+                        <tr>
+                            <th class="cursor-sort" onclick="sortBy('siteId')">Site ID <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('problemCategory')">Problem Category <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('status')">Status <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('aging')">Aging (days) <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('pic')">PIC <i class="fas fa-sort sort-icon"></i></th>
+                            <th>Root Cause / RCA</th>
+                            <th class="cursor-sort" onclick="sortBy('circle')">Circle <i class="fas fa-sort sort-icon"></i></th>
+                            <th class="cursor-sort" onclick="sortBy('vendor')">Vendor <i class="fas fa-sort sort-icon"></i></th>
+                            <th>Action / Remarks</th>
+                            <th>Remark BO TX</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailTableBody">
+                        <tr><td colspan="10" class="text-center py-4">Loading data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center footer-note pb-3">Data source: Google Sheets (auto-refresh every 30s) | <i class="fas fa-sync-alt"></i> Live updates | FME Quadrant Analysis Included</div>
+</div>
+
+<script>
+    Chart.register(ChartDataLabels);
+    // Register annotation plugin
+    Chart.register(ChartAnnotation);
+    
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXDY8x_bI1a8SkNCxREGLm2yPfgFg6NB_p-Eoe09_w0e4FcG8OfNs-4jlBvT1VXH4uMp4rwHLTBry0/pub?gid=0&single=true&output=csv";
+    
+    // FME Data (dari input yang diberikan)
+    const fmeData = [
+        { user: "Haryono.ms@adyawinsa.com", partner: "Adyawinsa", circle: "JAVA", ticket: "CM-20260331-00000829", fmeAccess: 3, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "agus.perdansyah.jb1@pmt.co.id", partner: "PMT", circle: "JAYA", ticket: "CM-20260331-00005874", fmeAccess: 3, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "waryono@mitra-ku.com", partner: "MKU", circle: "JAVA", ticket: "CM-20260310-00006238", fmeAccess: 5, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "waryono@mitra-ku.com", partner: "MKU", circle: "JAVA", ticket: "CM-20260304-00009050", fmeAccess: 5, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "waryono@mitra-ku.com", partner: "MKU", circle: "JAVA", ticket: "CM-20260331-00005004", fmeAccess: 5, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "hary.krismanto@pmt.co.id", partner: "PMT", circle: "JAYA", ticket: "CM-20260323-00003577", fmeAccess: 11, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "roy.fandi.jb3@pmt.co.id", partner: "PMT", circle: "JAYA", ticket: "CM-20260330-00006866", fmeAccess: 1, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "catur.budi@ptnw.co.id", partner: "Nexwave", circle: "KALISUMAPA", ticket: "CM-20260331-00006348", fmeAccess: 14, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "asnali.jb3@pmt.co.id", partner: "PMT", circle: "JAYA", ticket: "CM-20260331-00005813", fmeAccess: 2, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "yohanes.niki@ptnw.co.id", partner: "Nexwave", circle: "KALISUMAPA", ticket: "CM-20260331-00003047", fmeAccess: 1, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "muhammad.fadlek.lambogo@ptnw.co.id", partner: "Nexwave", circle: "KALISUMAPA", ticket: "CM-20260331-00002747", fmeAccess: 4, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "nur.faizin@mitra-ku.com", partner: "MKU", circle: "JAVA", ticket: "CM-20260330-00000920", fmeAccess: 7, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "izhar.izhar@ptnw.co.id", partner: "Nexwave", circle: "KALISUMAPA", ticket: "CM-20260330-00005557", fmeAccess: 6, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "jaka.nuryana.jb3@pmt.co.id", partner: "PMT", circle: "JAYA", ticket: "CM-20260324-00006394", fmeAccess: 2, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "setyawan.jb3@pmt.co.id", partner: "PMT", circle: "JAYA", ticket: "CM-20260328-00009633", fmeAccess: 2, successRateRemark: "Low Success Rate", usage: "Low Usage" },
+        { user: "herman.cj@mitra-ku.com", partner: "MKU", circle: "JAVA", ticket: "CM-20260329-00005853", fmeAccess: 2, successRateRemark: "Low Success Rate", usage: "Low Usage" }
+    ];
+
+    // Konversi ke nilai numerik
+    function getUsageValue(usage) {
+        if (usage === "Low Usage") return 1;
+        if (usage === "Medium Usage") return 2;
+        if (usage === "High Usage") return 3;
+        return 1;
+    }
+
+    function getSuccessRateValue(remark) {
+        if (remark === "Low Success Rate") return 1;
+        if (remark === "Medium Success Rate") return 2;
+        if (remark === "High Success Rate") return 3;
+        return 1;
+    }
+
+    function getQuadrant(usage, success) {
+        if (usage <= 1.5 && success <= 1.5) return "Critical";
+        if (usage > 1.5 && success <= 1.5) return "Need Attention";
+        if (usage > 1.5 && success > 1.5) return "Good";
+        return "Potential";
+    }
+
+    const processedFmeData = fmeData.map(item => ({
+        ...item,
+        usageValue: getUsageValue(item.usage),
+        successValue: getSuccessRateValue(item.successRateRemark),
+        quadrant: getQuadrant(getUsageValue(item.usage), getSuccessRateValue(item.successRateRemark))
+    }));
+
+    let masterData = [];
+    let filteredData = [];
+    let charts = {};
+    let fmeChart = null;
+    let currentSortField = 'aging';
+    let currentSortDir = 'desc';
+    let autoInterval = null;
+
+    function updateClock() { const now = new Date(); document.getElementById('liveClock').innerText = now.toLocaleTimeString('en-GB'); }
+    setInterval(updateClock, 1000); updateClock();
+
+    // FME Quadrant Chart
+    function updateFMEQuadrant() {
+        const datasets = [
+            { label: '🔴 Critical', data: [], backgroundColor: '#ff6b6b', borderColor: '#ff6b6b', pointRadius: 10, pointHoverRadius: 14 },
+            { label: '🟡 Need Attention', data: [], backgroundColor: '#ffd93d', borderColor: '#ffd93d', pointRadius: 10, pointHoverRadius: 14 },
+            { label: '🟢 Good', data: [], backgroundColor: '#6bcb77', borderColor: '#6bcb77', pointRadius: 10, pointHoverRadius: 14 },
+            { label: '🔵 Potential', data: [], backgroundColor: '#4d96ff', borderColor: '#4d96ff', pointRadius: 10, pointHoverRadius: 14 }
+        ];
+
+        let stats = { critical: 0, needAttention: 0, good: 0, potential: 0 };
+
+        processedFmeData.forEach(item => {
+            let datasetIndex = 0;
+            if (item.quadrant === "Critical") { datasetIndex = 0; stats.critical++; }
+            else if (item.quadrant === "Need Attention") { datasetIndex = 1; stats.needAttention++; }
+            else if (item.quadrant === "Good") { datasetIndex = 2; stats.good++; }
+            else { datasetIndex = 3; stats.potential++; }
+            
+            datasets[datasetIndex].data.push({
+                x: item.usageValue,
+                y: item.successValue,
+                user: item.user,
+                partner: item.partner,
+                circle: item.circle,
+                ticket: item.ticket,
+                fmeAccess: item.fmeAccess,
+                usage: item.usage,
+                successRate: item.successRateRemark
+            });
+        });
+
+        document.getElementById('statCritical').innerText = stats.critical;
+        document.getElementById('statNeedAttention').innerText = stats.needAttention;
+        document.getElementById('statGood').innerText = stats.good;
+        document.getElementById('statPotential').innerText = stats.potential;
+
+        if (fmeChart) fmeChart.destroy();
+
+        const ctx = document.getElementById('fmeQuadrantChart').getContext('2d');
+        fmeChart = new Chart(ctx, {
+            type: 'scatter',
+            data: { datasets: datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const point = context.raw;
+                                return [
+                                    `👤 User: ${point.user}`,
+                                    `🏢 Partner: ${point.partner}`,
+                                    `📍 Circle: ${point.circle}`,
+                                    `🎫 Ticket: ${point.ticket}`,
+                                    `📊 FME Access: ${point.fmeAccess}`,
+                                    `📈 Usage: ${point.usage}`,
+                                    `✅ Success Rate: ${point.successRate}`,
+                                    `💡 Rekomendasi: ${getRecommendation(point.quadrant)}`
+                                ];
+                            }
+                        }
+                    },
+                    annotation: {
+                        annotations: {
+                            lineX: {
+                                type: 'line',
+                                xMin: 1.5,
+                                xMax: 1.5,
+                                borderColor: '#e94560',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                label: { content: 'Median Usage', enabled: true, position: 'end', color: '#e94560' }
+                            },
+                            lineY: {
+                                type: 'line',
+                                yMin: 1.5,
+                                yMax: 1.5,
+                                borderColor: '#e94560',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                label: { content: 'Median Success Rate', enabled: true, position: 'end', color: '#e94560' }
+                            }
+                        }
+                    },
+                    legend: { position: 'bottom' }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Usage Rate (1=Low, 2=Medium, 3=High)', font: { size: 12, weight: 'bold' } },
+                        min: 0.5, max: 3.5,
+                        ticks: {
+                            stepSize: 0.5,
+                            callback: function(val) {
+                                if (val === 1) return 'Low Usage';
+                                if (val === 2) return 'Medium';
+                                if (val === 3) return 'High Usage';
+                                return val;
+                            }
+                        }
+                    },
+                    y: {
+                        title: { display: true, text: 'Success Rate (1=Low, 2=Medium, 3=High)', font: { size: 12, weight: 'bold' } },
+                        min: 0.5, max: 3.5,
+                        ticks: {
+                            stepSize: 0.5,
+                            callback: function(val) {
+                                if (val === 1) return 'Low Success';
+                                if (val === 2) return 'Medium';
+                                if (val === 3) return 'High Success';
+                                return val;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function getRecommendation(quadrant) {
+        if (quadrant === "Critical") return "Perlu pelatihan intensif dan pendampingan";
+        if (quadrant === "Need Attention") return "Evaluasi proses dan perbaiki metode kerja";
+        if (quadrant === "Good") return "Pertahankan dan jadikan best practice";
+        return "Tingkatkan usage untuk maksimalkan potensi";
+    }
+
+    async function loadData() {
+        document.getElementById('dataStatusBadge').innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Fetching...';
+        try {
+            const response = await fetch(CSV_URL);
+            const csvText = await response.text();
+            Papa.parse(csvText, { header: true, skipEmptyLines: true, complete: (results) => {
+                if(results.data && results.data.length) {
+                    processRawData(results.data);
+                } else { masterData = []; applyFilters(); }
+                document.getElementById('dataStatusBadge').innerHTML = '<i class="fas fa-check-circle"></i> Synced';
+                setTimeout(()=>{ document.getElementById('dataStatusBadge').innerHTML = '<i class="fas fa-cloud"></i> Live'; }, 2000);
+            }});
+        } catch(e) { console.error(e); document.getElementById('dataStatusBadge').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error'; masterData=[]; applyFilters(); }
+        updateFMEQuadrant();
+    }
+
+    function processRawData(rows) {
+        const dataset = [];
+        const circlesSet = new Set(), categoriesSet = new Set();
+        rows.forEach(row => {
+            const siteId = (row['Site ID'] || row['Site ID Problem'] || row['Site ID'] || '').trim();
+            if(!siteId) return;
+            let priorityRaw = (row['Priority'] || '').toString().toUpperCase();
+            let priority = (priorityRaw.includes('P1') || priorityRaw === 'P1') ? 'P1' : 'P2';
+            let statusChronic = (row['Status Chronic'] || row['Status'] || row['Final Status'] || '').toString().trim();
+            let status = (statusChronic.toLowerCase().includes('closed') || statusChronic.toLowerCase() === 'closed') ? 'Closed' : 'Open';
+            let agingVal = parseInt(row['Occurance / Sum Issue'] || row['Occurance'] || row['Occurance / Sum Issue'] || 0);
+            if(isNaN(agingVal)) agingVal = 0;
+            let problemCat = (row['RCA Grouping Auto'] || row['Problem'] || row['RCA'] || 'General Issue').trim().substring(0,70);
+            let circle = (row['Circle'] || '').trim();
+            let vendorLink = (row['Vendor Link'] || row['Vendor'] || '').trim();
+            let picFinal = (row['PIC Final'] || row['Update PIC'] || row['PIC'] || 'Unassigned').trim();
+            let rcaDetail = (row['Detail RCA'] || row['RCA'] || '').trim();
+            let actionFSO = (row['Action'] || row['Action FSO'] || row['Action'] || '').trim();
+            let remarkBO = (row['Remark BO TX'] || row['Remark BO TX'] || '').trim();
+            
+            if(circle) circlesSet.add(circle);
+            if(problemCat) categoriesSet.add(problemCat);
+            
+            dataset.push({
+                siteId, priority, status, aging: agingVal, problemCategory: problemCat || 'Undefined',
+                circle: circle || 'Unknown', vendor: vendorLink || 'N/A', pic: picFinal || '—',
+                rootCause: rcaDetail || '-', action: actionFSO || '-', remarkBO: remarkBO || '-'
+            });
+        });
+        masterData = dataset;
+        
+        const circleSelect = document.getElementById('filterCircle');
+        circleSelect.innerHTML = '<option value="">All Circles</option>';
+        Array.from(circlesSet).sort().forEach(c => { let opt = document.createElement('option'); opt.value = c; opt.innerText = c; circleSelect.appendChild(opt); });
+        const catSelect = document.getElementById('filterCategory');
+        catSelect.innerHTML = '<option value="">All Categories</option>';
+        Array.from(categoriesSet).sort().forEach(c => { let opt = document.createElement('option'); opt.value = c; opt.innerText = c; catSelect.appendChild(opt); });
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const searchTerm = document.getElementById('searchSite').value.toLowerCase();
+        const statusFilter = document.getElementById('filterStatus').value;
+        const circleFilter = document.getElementById('filterCircle').value;
+        const categoryFilter = document.getElementById('filterCategory').value;
+        
+        filteredData = masterData.filter(item => {
+            if(searchTerm && !item.siteId.toLowerCase().includes(searchTerm)) return false;
+            if(statusFilter && item.status !== statusFilter) return false;
+            if(circleFilter && item.circle !== circleFilter) return false;
+            if(categoryFilter && item.problemCategory !== categoryFilter) return false;
+            return true;
+        });
+        updateKPIs();
+        updateCharts();
+        updateSummaryTables();
+        if(document.getElementById('detailTablePanel').style.display === 'block') {
+            applyDetailFilters();
+        }
+    }
+    
+    function applyDetailFilters() {
+        let detailFiltered = [...filteredData];
+        const filterSite = document.getElementById('filterSiteId')?.value.toLowerCase() || '';
+        const filterProb = document.getElementById('filterProblem')?.value.toLowerCase() || '';
+        const filterStat = document.getElementById('filterDetailStatus')?.value || '';
+        const filterAgingMin = parseInt(document.getElementById('filterAging')?.value) || 0;
+        const filterPic = document.getElementById('filterPIC')?.value.toLowerCase() || '';
+        const filterRca = document.getElementById('filterRootCause')?.value.toLowerCase() || '';
+        const filterCircleDet = document.getElementById('filterCircleDetail')?.value.toLowerCase() || '';
+        const filterVendor = document.getElementById('filterVendor')?.value.toLowerCase() || '';
+        const filterAction = document.getElementById('filterAction')?.value.toLowerCase() || '';
+        const filterRemark = document.getElementById('filterRemark')?.value.toLowerCase() || '';
+        
+        detailFiltered = detailFiltered.filter(item => {
+            if(filterSite && !item.siteId.toLowerCase().includes(filterSite)) return false;
+            if(filterProb && !item.problemCategory.toLowerCase().includes(filterProb)) return false;
+            if(filterStat && item.status !== filterStat) return false;
+            if(filterAgingMin > 0 && item.aging < filterAgingMin) return false;
+            if(filterPic && !item.pic.toLowerCase().includes(filterPic)) return false;
+            if(filterRca && !item.rootCause.toLowerCase().includes(filterRca)) return false;
+            if(filterCircleDet && !item.circle.toLowerCase().includes(filterCircleDet)) return false;
+            if(filterVendor && !item.vendor.toLowerCase().includes(filterVendor)) return false;
+            if(filterAction && !item.action.toLowerCase().includes(filterAction)) return false;
+            if(filterRemark && !item.remarkBO.toLowerCase().includes(filterRemark)) return false;
+            return true;
+        });
+        
+        detailFiltered.sort((a,b)=>{
+            let aVal = a[currentSortField], bVal = b[currentSortField];
+            if(currentSortField === 'aging') return currentSortDir === 'asc' ? aVal - bVal : bVal - aVal;
+            if(typeof aVal === 'string') return currentSortDir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+            return 0;
+        });
+        renderDetailTableBody(detailFiltered);
+        document.getElementById('detailCountBadge').innerHTML = `${detailFiltered.length} rows`;
+    }
+    
+    function clearAllColumnFilters() {
+        const filterIds = ['filterSiteId','filterProblem','filterDetailStatus','filterAging','filterPIC','filterRootCause','filterCircleDetail','filterVendor','filterAction','filterRemark'];
+        filterIds.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+        applyDetailFilters();
+    }
+    
+    function renderDetailTableBody(data) {
+        const tbody = document.getElementById('detailTableBody');
+        if(!data.length) {
+            tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4">No matching records</td></tr>';
+            return;
+        }
+        tbody.innerHTML = data.map(item => `
+            <tr>
+                <td class="site-id-mono"><strong>${escapeHtml(item.siteId)}</strong></td>
+                <td style="max-width: 210px;">${escapeHtml(item.problemCategory.substring(0,65))}${item.problemCategory.length>65?'...':''}</td>
+                <td><span class="badge ${item.status==='Open'?'badge-open':'badge-closed'}">${escapeHtml(item.status)}</span></td>
+                <td><span class="aging-badge ${item.aging>60?'bg-danger':item.aging>30?'bg-warning text-dark':'bg-info'} text-white">${item.aging} d</span></td>
+                <td>${escapeHtml(item.pic)}</td>
+                <td style="max-width: 210px; font-size: 0.7rem;" title="${escapeHtml(item.rootCause)}">${escapeHtml(item.rootCause.substring(0,65))}${item.rootCause.length>65?'...':''}</td>
+                <td>${escapeHtml(item.circle)}</td>
+                <td>${escapeHtml(item.vendor)}</td>
+                <td style="max-width: 180px; font-size: 0.7rem;" title="${escapeHtml(item.action)}">${escapeHtml(item.action.substring(0,55))}${item.action.length>55?'...':''}</td>
+                <td class="remark-cell" style="max-width: 200px; font-size: 0.7rem;" title="${escapeHtml(item.remarkBO)}">${escapeHtml(item.remarkBO.substring(0,60))}${item.remarkBO.length>60?'...':''}</td>
+            </tr>
+        `).join('');
+    }
+    
+    function sortBy(field) {
+        if(currentSortField === field) currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+        else { currentSortField = field; currentSortDir = 'desc'; }
+        applyDetailFilters();
+    }
+    
+    function updateKPIs() {
+        document.getElementById('kpiTotal').innerText = masterData.length;
+        document.getElementById('kpiSites').innerText = new Set(masterData.map(d=>d.siteId)).size;
+        document.getElementById('kpiOpen').innerText = filteredData.filter(d=>d.status==='Open').length;
+        document.getElementById('kpiClosed').innerText = filteredData.filter(d=>d.status==='Closed').length;
+        document.getElementById('kpiAging').innerText = filteredData.filter(d=>d.aging > 30).length;
+    }
+
+    function updateCharts() {
+        const open = filteredData.filter(d=>d.status==='Open').length;
+        const closed = filteredData.filter(d=>d.status==='Closed').length;
+        if(charts.status) charts.status.destroy();
+        charts.status = new Chart(document.getElementById('statusChart'), { type:'doughnut', data:{ labels:['Open','Closed'], datasets:[{ data:[open,closed], backgroundColor:['#dc2626','#10b981'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'bottom', labels:{ font:{ size:11, family:"'Inter', sans-serif" } } }, datalabels:{ color:'white', font:{ weight:'bold', size:12 }, formatter:(val,ctx)=>{ let total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total?((val/total)*100).toFixed(1)+'%':''; } } } } });
+        
+        let catMap = new Map();
+        filteredData.forEach(d=>{ let c = d.problemCategory; catMap.set(c, (catMap.get(c)||0)+1); });
+        let sortedCat = Array.from(catMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,7);
+        if(charts.category) charts.category.destroy();
+        charts.category = new Chart(document.getElementById('categoryChart'), { type:'bar', data:{ labels:sortedCat.map(c=>c[0]), datasets:[{ data:sortedCat.map(c=>c[1]), backgroundColor:'#3b82f6', borderRadius:8 }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:true, plugins:{ datalabels:{ anchor:'end', align:'right', color:'#000', font:{ weight:'bold', size:11 }, formatter:(v)=>v }, legend:{display:false} }, scales:{ x:{ beginAtZero:true, ticks:{ font:{ size:10 } } }, y:{ ticks:{ font:{ size:10 } } } } } });
+        
+        let circleMap = new Map();
+        filteredData.forEach(d=>{ let cir = d.circle; circleMap.set(cir, (circleMap.get(cir)||0)+1); });
+        let sortedCircle = Array.from(circleMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,5);
+        if(charts.circle) charts.circle.destroy();
+        charts.circle = new Chart(document.getElementById('circleChart'), { type:'pie', data:{ labels:sortedCircle.map(c=>c[0]), datasets:[{ data:sortedCircle.map(c=>c[1]), backgroundColor:['#0ea5e9','#8b5cf6','#f59e0b','#ef4444','#10b981'] }] }, options:{ plugins:{ datalabels:{ color:'white', font:{ size:11, weight:'bold' }, formatter:(val,ctx)=>{ let total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total?((val/total)*100).toFixed(1)+'%':''; } }, legend:{ position:'right', labels:{ font:{ size:10 } } } } } });
+        
+        let vendorMap = new Map();
+        filteredData.forEach(d=>{ let v = d.vendor || 'Unknown'; vendorMap.set(v, (vendorMap.get(v)||0)+1); });
+        let sortedVendor = Array.from(vendorMap.entries()).sort((a,b)=>b[1]-a[1]);
+        if(charts.vendor) charts.vendor.destroy();
+        charts.vendor = new Chart(document.getElementById('vendorChart'), { type:'bar', data:{ labels:sortedVendor.map(v=>v[0]), datasets:[{ data:sortedVendor.map(v=>v[1]), backgroundColor:'#2c7da0' }] }, options:{ plugins:{ datalabels:{ anchor:'end', align:'top', color:'#000', font:{ size:11, weight:'bold' }, formatter:(v)=>v }, legend:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:10 } } }, x:{ ticks:{ font:{ size:10 } } } } } });
+        
+        let picMap = new Map();
+        filteredData.forEach(d=>{ let p = d.pic; if(p && p!=='—') picMap.set(p, (picMap.get(p)||0)+1); });
+        let topPics = Array.from(picMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,5);
+        if(charts.pic) charts.pic.destroy();
+        charts.pic = new Chart(document.getElementById('picChart'), { type:'pie', data:{ labels:topPics.map(p=>p[0]), datasets:[{ data:topPics.map(p=>p[1]), backgroundColor:['#9b59b6','#3498db','#e67e22','#2ecc71','#e74c3c'] }] }, options:{ plugins:{ datalabels:{ color:'white', font:{ size:11, weight:'bold' }, formatter:(val,ctx)=>{ let total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total?((val/total)*100).toFixed(0)+'%':''; } }, legend:{ position:'right', labels:{ font:{ size:10 } } } } } });
+    }
+
+    function updateSummaryTables() {
+        let siteMap = new Map();
+        filteredData.forEach(d=>{ let s=d.siteId; if(!siteMap.has(s)) siteMap.set(s,{total:0,open:0,p1:0}); let stat = siteMap.get(s); stat.total++; if(d.status==='Open') stat.open++; if(d.priority==='P1') stat.p1++; });
+        let topSites = Array.from(siteMap.entries()).map(([id,val])=> ({id, ...val})).sort((a,b)=>b.total-a.total).slice(0,8);
+        document.getElementById('topSitesTable').innerHTML = topSites.map(s=>`<tr><td class="site-id-mono">${escapeHtml(s.id)}</td><td class="fw-bold">${s.total}</td><td>${s.open}</td><td>${s.p1}</td></tr>`).join('') || '<tr><td colspan="4" class="text-center">No data</td></tr>';
+        
+        let agingOpen = filteredData.filter(d=>d.status==='Open').sort((a,b)=>b.aging - a.aging).slice(0,8);
+        document.getElementById('agingTable').innerHTML = agingOpen.map(a=>`<tr><td class="site-id-mono">${escapeHtml(a.siteId)}</td><td class="small">${escapeHtml(a.problemCategory.substring(0,35))}</td><td><span class="aging-badge ${a.aging>60?'bg-danger':a.aging>30?'bg-warning':'bg-primary'} text-white">${a.aging}d</span></td><td><span class="badge badge-open">Open</span></td></tr>`).join('') || '<tr><td colspan="4">No open issues</td></tr>';
+        
+        let vendorPerf = new Map();
+        filteredData.forEach(d=>{ let v = d.vendor; if(!vendorPerf.has(v)) vendorPerf.set(v,{total:0,open:0,sumAging:0,openCount:0}); let rec = vendorPerf.get(v); rec.total++; if(d.status==='Open') { rec.open++; rec.sumAging+=d.aging; rec.openCount++; } });
+        let vendorArr = Array.from(vendorPerf.entries()).map(([name,val])=>({name, total:val.total, open:val.open, avgAging: val.openCount?Math.round(val.sumAging/val.openCount):0})).sort((a,b)=>b.total-a.total);
+        document.getElementById('vendorPerfTable').innerHTML = vendorArr.map(v=>`<tr><td><strong>${escapeHtml(v.name)}</strong></td><td>${v.total}</td><td>${v.open}</td><td>${v.avgAging}d</td></tr>`).join('') || '<tr><td colspan="4">—</td></tr>';
+    }
+    
+    function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>]/g, function(m){ if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m; }); }
+    
+    function showDetailTable() {
+        document.getElementById('detailTablePanel').style.display = 'block';
+        const filterIds = ['filterSiteId','filterProblem','filterDetailStatus','filterAging','filterPIC','filterRootCause','filterCircleDetail','filterVendor','filterAction','filterRemark'];
+        filterIds.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.removeEventListener('input', applyDetailFilters);
+            if(el) el.removeEventListener('change', applyDetailFilters);
+            if(el && (el.tagName === 'INPUT' || el.tagName === 'SELECT')) {
+                el.addEventListener('input', applyDetailFilters);
+                el.addEventListener('change', applyDetailFilters);
+            }
+        });
+        applyDetailFilters();
+    }
+    function hideDetailTable() { document.getElementById('detailTablePanel').style.display = 'none'; }
+    function resetAllFilters() {
+        document.getElementById('searchSite').value='';
+        document.getElementById('filterStatus').value='';
+        document.getElementById('filterCircle').value='';
+        document.getElementById('filterCategory').value='';
+        applyFilters();
+    }
+    function exportCSV() {
+        let dataToExport = filteredData;
+        if(document.getElementById('detailTablePanel').style.display === 'block') {
+            let temp = [...filteredData];
+            const fSite = document.getElementById('filterSiteId')?.value.toLowerCase() || '';
+            if(fSite) temp = temp.filter(i=>i.siteId.toLowerCase().includes(fSite));
+            dataToExport = temp;
+        }
+        if(!dataToExport.length) return alert('No data to export');
+        let headers = ['Site ID','Status','Aging (days)','Problem Category','Circle','Vendor','PIC','Root Cause','Action','Remark BO TX'];
+        let rows = dataToExport.map(d=>[d.siteId, d.status, d.aging, d.problemCategory, d.circle, d.vendor, d.pic, d.rootCause, d.action, d.remarkBO]);
+        let csvContent = [headers.join(','), ...rows.map(r=>r.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(','))].join('\n');
+        const blob = new Blob([csvContent], {type:'text/csv'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `twamp_issues_${new Date().toISOString().slice(0,19)}.csv`; a.click(); URL.revokeObjectURL(a.href);
+    }
+    function startAutoRefresh() { if(autoInterval) clearInterval(autoInterval); autoInterval = setInterval(()=> loadData(), 30000); }
+    
+    window.addEventListener('load', ()=>{ loadData(); startAutoRefresh(); });
+</script>
+</body>
+</html>
