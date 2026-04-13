@@ -3,96 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Twamp Dashboard - Network Issue Tracker</title>
+    <title>FME Copilot Access Dashboard - User & SR Analytics</title>
     <!-- Bootstrap 5 + Icons + Fonts -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- PapaParse, Chart.js + datalabels -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         :root {
-            --primary-deep: #0f2b4d;
-            --accent-teal: #2ba6cb;
-            --bg-light: #f4f7fc;
-            --card-radius: 20px;
+            --primary-dark: #0a1e3c;
+            --primary-blue: #1e40af;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-end: #1e293b;
+            --card-radius: 24px;
             --font-main: 'Inter', sans-serif;
             --font-heading: 'Plus Jakarta Sans', sans-serif;
         }
         body {
-            background: var(--bg-light);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             font-family: var(--font-main);
             font-size: 14px;
             overflow-x: auto;
+            min-height: 100vh;
         }
-        .hero-header {
-            background: linear-gradient(105deg, #0b2b44 0%, #1c5d7a 100%);
-            border-radius: 0 0 24px 24px;
-            padding: 1rem 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 12px 20px -12px rgba(0,0,0,0.2);
-        }
-        .hero-header h1 { font-family: var(--font-heading); font-weight: 800; font-size: 1.8rem; }
-        .hero-header p { font-size: 0.85rem; opacity: 0.85; }
         
-        /* KPI cards */
-        .kpi-glass {
+        /* Header Premium */
+        .hero-header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 50%, var(--accent-cyan) 100%);
+            border-radius: 0 0 32px 32px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-header h1 { 
+            font-family: var(--font-heading); 
+            font-weight: 800; 
+            font-size: 2rem;
+            letter-spacing: -0.5px;
+        }
+        .hero-header p { font-size: 0.85rem; opacity: 0.9; }
+        
+        /* KPI Cards */
+        .kpi-card {
             background: white;
             border-radius: var(--card-radius);
             border: none;
-            box-shadow: 0 8px 18px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-            height: 100%;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
         }
-        .kpi-glass:hover { transform: translateY(-3px); }
-        .kpi-number { font-size: 2rem; font-weight: 800; font-family: var(--font-heading); letter-spacing: -0.5px; }
-        .kpi-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; color: #6c757d; }
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+        }
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .kpi-number { 
+            font-size: 2.2rem; 
+            font-weight: 800; 
+            font-family: var(--font-heading);
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+        .kpi-label { 
+            font-size: 0.7rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.8px; 
+            font-weight: 700; 
+            color: #64748b;
+        }
+        .kpi-trend {
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+        }
         
+        /* Filter Card */
         .filter-card {
             background: white;
-            border-radius: 24px;
+            border-radius: 20px;
             border: none;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.03);
-            padding: 1rem 1.5rem;
-        }
-        
-        /* Badges */
-        .badge-p1 { background: #e11d48; color: white; font-weight: 600; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; }
-        .badge-p2 { background: #f97316; color: white; font-size: 0.7rem; }
-        .badge-open { background: #dc2626; color: white; font-size: 0.7rem; font-weight: 600; }
-        .badge-closed { background: #10b981; color: white; font-size: 0.7rem; }
-        .aging-badge { padding: 4px 8px; border-radius: 30px; font-weight: 600; font-size: 0.7rem; display: inline-block; }
-        
-        .chart-card { 
-            background: white; 
-            border-radius: 24px; 
-            padding: 1.2rem; 
-            height: 100%; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
         }
-        .chart-card h6 { 
-            font-family: var(--font-heading); 
-            font-weight: 700; 
-            font-size: 1rem; 
-            margin-bottom: 1rem;
+        
+        /* Chart Cards */
+        .chart-card {
+            background: white;
+            border-radius: var(--card-radius);
+            padding: 1.25rem;
+            height: 100%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        .chart-card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .chart-card h6 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 1.25rem;
             color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        /* Summary Tables */
-        .summary-table-container { max-height: 280px; overflow-y: auto; }
-        .summary-table { font-size: 0.75rem; width: 100%; }
-        .summary-table th { font-size: 0.7rem; font-weight: 700; background: #f1f5f9; padding: 8px 6px; }
-        .summary-table td { font-size: 0.75rem; padding: 8px 6px; vertical-align: middle; }
+        /* Status Badges */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-resolved { background: #d1fae5; color: #065f46; }
+        .status-in-progress { background: #fed7aa; color: #9a3412; }
+        .status-open { background: #fee2e2; color: #991b1b; }
+        .status-pending { background: #fef3c7; color: #92400e; }
         
-        /* DETAIL TABLE - Enhanced with column filters */
-        .detail-table-container { 
-            background: white; 
-            border-radius: 28px; 
-            overflow: hidden; 
-            box-shadow: 0 12px 28px rgba(0,0,0,0.08); 
+        /* User Avatar Style */
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--primary-blue));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        /* Detail Table */
+        .detail-table-container {
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.08);
             margin-top: 1rem;
             margin-bottom: 2rem;
         }
@@ -106,192 +188,406 @@
             flex-wrap: wrap;
             gap: 12px;
         }
-        .scroll-table { 
-            max-height: 550px; 
-            overflow-y: auto; 
+        .scroll-table {
+            max-height: 500px;
+            overflow-y: auto;
             overflow-x: auto;
         }
         .detail-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.8rem;
-            min-width: 1300px;
+            min-width: 1000px;
         }
         .detail-table th, .detail-table td {
-            padding: 12px 10px;
+            padding: 12px 12px;
             vertical-align: middle;
-            border-bottom: 1px solid #eef2f6;
+            border-bottom: 1px solid #f0f2f5;
         }
         .detail-table th {
-            background: #1e293b;
-            color: white;
+            background: #f8fafc;
+            color: #1e293b;
             font-weight: 700;
             font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
             position: sticky;
             top: 0;
             z-index: 10;
+            border-bottom: 2px solid #e2e8f0;
         }
-        .detail-table td {
-            font-size: 0.75rem;
-            line-height: 1.4;
-            color: #1f2a44;
-        }
-        .filter-input-cell {
-            padding: 6px 8px !important;
+        .detail-table tr:hover {
             background: #f8fafc;
         }
-        .filter-input-cell input, .filter-input-cell select {
+        
+        /* Quadrant Chart */
+        .quadrant-container {
+            position: relative;
             width: 100%;
-            padding: 5px 8px;
+            min-height: 420px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 20px;
+            padding: 20px;
+        }
+        .quadrant-grid {
+            position: relative;
+            width: 100%;
+            height: 380px;
+            border: 2px solid #334155;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.9);
+        }
+        .quadrant-label {
+            position: absolute;
             font-size: 0.7rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            background: white;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.75);
+            color: white;
+            letter-spacing: 0.5px;
         }
-        .filter-input-cell input:focus, .filter-input-cell select:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
+        .quadrant-point {
+            position: absolute;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            border: 2px solid white;
+            color: white;
         }
-        .site-id-mono { font-family: 'SF Mono', monospace; font-weight: 600; color: #075985; font-size: 0.75rem; }
-        .remark-cell { max-width: 200px; white-space: normal; word-break: break-word; font-size: 0.7rem; }
-        .sort-icon { margin-left: 4px; font-size: 0.7rem; opacity: 0.7; cursor: pointer; }
-        .cursor-sort { cursor: pointer; user-select: none; }
-        .cursor-sort:hover { background-color: #2d3a4e; }
+        .quadrant-point:hover {
+            transform: scale(1.15);
+            z-index: 20;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
         
-        .footer-note { font-size: 0.7rem; color: #5b6e8c; }
-        .btn-sm-custom { font-size: 0.7rem; padding: 5px 12px; border-radius: 30px; }
-        
-        /* Chart text improvements */
-        canvas { font-family: var(--font-main); }
+        .footer-note {
+            font-size: 0.7rem;
+            color: #64748b;
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 1rem;
+        }
         
         @media (max-width: 768px) {
-            .kpi-number { font-size: 1.5rem; }
-            .detail-table { font-size: 0.7rem; }
+            .kpi-number { font-size: 1.6rem; }
+            .hero-header h1 { font-size: 1.3rem; }
+            .quadrant-container { min-height: 350px; }
+            .quadrant-grid { height: 300px; }
+        }
+        
+        .btn-custom {
+            border-radius: 30px;
+            padding: 6px 18px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-blue);
         }
     </style>
 </head>
 <body>
 
 <div class="hero-header">
-    <div class="container-fluid d-flex justify-content-between align-items-center flex-wrap">
-        <div>
-            <h1 class="text-white mb-0"><i class="fas fa-tachometer-alt me-2"></i>Twamp Dashboard</h1>
-            <p class="text-white-50 mb-0 small">Network Issue Intelligence & Resolution Tracker</p>
-        </div>
-        <div class="text-end">
-            <span class="badge bg-light text-dark px-3 py-2 rounded-pill"><i class="far fa-clock me-1"></i> <span id="liveClock">--:--:--</span></span>
-            <span class="badge bg-dark ms-2 px-3 py-2 rounded-pill" id="dataStatusBadge"><i class="fas fa-sync-alt fa-fw"></i> Loading</span>
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="text-white mb-1">
+                    <i class="fas fa-robot me-2"></i>FME Copilot Access Dashboard
+                </h1>
+                <p class="text-white-50 mb-0">
+                    <i class="fas fa-chart-line me-1"></i> Service Request Analytics & User Activity Monitoring
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <span class="badge bg-white text-dark px-3 py-2 rounded-pill me-2">
+                    <i class="far fa-clock me-1"></i> <span id="liveClock">--:--:--</span>
+                </span>
+                <span class="badge bg-dark px-3 py-2 rounded-pill" id="dataStatusBadge">
+                    <i class="fas fa-sync-alt fa-fw"></i> Loading
+                </span>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="container-fluid px-4">
-    <!-- KPI Row (5 cards) -->
+    <!-- KPI Row - 6 Cards -->
     <div class="row g-3 mb-4">
-        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Total Issues</div><div class="kpi-number" id="kpiTotal">0</div><div class="small text-muted">all records</div></div></div>
-        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Unique Sites</div><div class="kpi-number" id="kpiSites">0</div><div class="small text-muted">distinct locations</div></div></div>
-        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Open Issues</div><div class="kpi-number text-danger" id="kpiOpen">0</div><div class="small text-muted">pending</div></div></div>
-        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Closed</div><div class="kpi-number text-success" id="kpiClosed">0</div><div class="small text-muted">resolved</div></div></div>
-        <div class="col-xl-2 col-md-4 col-6"><div class="kpi-glass p-3"><div class="kpi-label">Aging >30d</div><div class="kpi-number text-info" id="kpiAging">0</div><div class="small text-muted">long-standing</div></div></div>
-    </div>
-
-    <!-- Filter Bar (without priority filter) -->
-    <div class="filter-card mb-4">
-        <div class="row g-3 align-items-end">
-            <div class="col-md-3"><label class="small fw-bold"><i class="fas fa-search"></i> Site ID</label><input type="text" id="searchSite" class="form-control form-control-sm" placeholder="e.g., 07BNS0182"></div>
-            <div class="col-md-2"><label class="small fw-bold">Status</label><select id="filterStatus" class="form-select form-select-sm"><option value="">All</option><option value="Open">Open</option><option value="Closed">Closed</option></select></div>
-            <div class="col-md-2"><label class="small fw-bold">Circle</label><select id="filterCircle" class="form-select form-select-sm"><option value="">All Circles</option></select></div>
-            <div class="col-md-3"><label class="small fw-bold">Problem Category</label><select id="filterCategory" class="form-select form-select-sm"><option value="">All Categories</option></select></div>
-            <div class="col-md-2 d-flex justify-content-end gap-2 mt-2 mt-md-0"><button class="btn btn-sm btn-outline-secondary" onclick="resetAllFilters()"><i class="fas fa-undo-alt"></i> Reset</button><button class="btn btn-sm btn-primary" onclick="showDetailTable()"><i class="fas fa-table-list"></i> Show Details</button><button class="btn btn-sm btn-outline-success" onclick="exportCSV()"><i class="fas fa-download"></i> Export</button></div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2); color: white;">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="kpi-number" id="kpiTotalUsers">0</div>
+                <div class="kpi-label">Total Users</div>
+                <div class="kpi-trend text-success"><i class="fas fa-user-plus"></i> Active Access</div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white;">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <div class="kpi-number" id="kpiTotalSR">0</div>
+                <div class="kpi-label">Total SR</div>
+                <div class="kpi-trend text-info"><i class="fas fa-chart-line"></i> All Requests</div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
+                    <i class="fas fa-spinner"></i>
+                </div>
+                <div class="kpi-number text-warning" id="kpiOpenSR">0</div>
+                <div class="kpi-label">Open SR</div>
+                <div class="kpi-trend"><i class="fas fa-hourglass-half"></i> In Progress</div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="kpi-number text-success" id="kpiClosedSR">0</div>
+                <div class="kpi-label">Closed/Resolved</div>
+                <div class="kpi-trend"><i class="fas fa-check"></i> Completed</div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white;">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="kpi-number" id="kpiHighAging">0</div>
+                <div class="kpi-label">Aging > 7 Days</div>
+                <div class="kpi-trend text-danger"><i class="fas fa-exclamation-triangle"></i> Need Attention</div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white;">
+                    <i class="fas fa-chart-simple"></i>
+                </div>
+                <div class="kpi-number" id="kpiResRate">0%</div>
+                <div class="kpi-label">Resolution Rate</div>
+                <div class="kpi-trend"><i class="fas fa-percent"></i> Success Rate</div>
+            </div>
         </div>
     </div>
 
-    <!-- Charts Row (Status + Category) with improved fonts -->
-    <div class="row g-4 mb-4">
-        <div class="col-lg-5"><div class="chart-card"><h6><i class="fas fa-chart-pie me-2 text-primary"></i>Status Breakdown</h6><canvas id="statusChart" height="220"></canvas></div></div>
-        <div class="col-lg-7"><div class="chart-card"><h6><i class="fas fa-bug me-2 text-danger"></i>Top Problem Categories</h6><canvas id="categoryChart" height="220"></canvas></div></div>
+    <!-- Filter Card -->
+    <div class="filter-card">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="small fw-bold text-muted"><i class="fas fa-search"></i> Search User</label>
+                <input type="text" id="searchUser" class="form-control form-control-sm" placeholder="User name or email...">
+            </div>
+            <div class="col-md-3">
+                <label class="small fw-bold text-muted"><i class="fas fa-filter"></i> Status</label>
+                <select id="filterStatus" class="form-select form-select-sm">
+                    <option value="">All Status</option>
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved/Closed</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="small fw-bold text-muted"><i class="fas fa-tag"></i> SR Category</label>
+                <select id="filterCategory" class="form-select form-select-sm">
+                    <option value="">All Categories</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex justify-content-end gap-2">
+                <button class="btn btn-sm btn-outline-secondary btn-custom" onclick="resetAllFilters()">
+                    <i class="fas fa-undo-alt"></i> Reset
+                </button>
+                <button class="btn btn-sm btn-primary btn-custom" onclick="showDetailTable()">
+                    <i class="fas fa-table-list"></i> Details
+                </button>
+                <button class="btn btn-sm btn-outline-success btn-custom" onclick="exportCSV()">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+        </div>
     </div>
+
+    <!-- QUADRANT CHART - User Activity vs SR Volume -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="chart-card">
+                <h6>
+                    <i class="fas fa-chart-simple text-primary"></i> 
+                    User Activity Quadrant: SR Volume vs Resolution Performance
+                </h6>
+                <div class="quadrant-container">
+                    <div class="quadrant-grid" id="quadrantGrid">
+                        <!-- Quadrant akan diisi JS -->
+                    </div>
+                    <div class="quadrant-legend" style="position: absolute; bottom: 10px; right: 10px; background: white; padding: 8px 12px; border-radius: 12px; font-size: 0.7rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #dc2626; margin-right: 6px;"></span> High Volume + Slow Resolution</div>
+                        <div><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; margin-right: 6px;"></span> High Volume</div>
+                        <div><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #8b5cf6; margin-right: 6px;"></span> Slow Resolution</div>
+                        <div><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981; margin-right: 6px;"></span> Optimal</div>
+                    </div>
+                </div>
+                <div class="text-center mt-2 small text-muted">
+                    <i class="fas fa-info-circle"></i> Bubble size = Total SR | Hover for details | Click to filter
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="chart-card">
+                <h6><i class="fas fa-chart-pie text-primary"></i> SR Status Distribution</h6>
+                <canvas id="statusChart" height="250"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="chart-card">
+                <h6><i class="fas fa-chart-bar text-success"></i> Top SR Categories</h6>
+                <canvas id="categoryChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+
     <!-- Charts Row 2 -->
     <div class="row g-4 mb-4">
-        <div class="col-lg-4"><div class="chart-card"><h6><i class="fas fa-globe me-2 text-info"></i>Issues by Circle</h6><canvas id="circleChart" height="200"></canvas></div></div>
-        <div class="col-lg-4"><div class="chart-card"><h6><i class="fas fa-microchip me-2 text-secondary"></i>Vendor Analysis</h6><canvas id="vendorChart" height="200"></canvas></div></div>
-        <div class="col-lg-4"><div class="chart-card"><h6><i class="fas fa-users me-2 text-success"></i>PIC Workload (Top 5)</h6><canvas id="picChart" height="200"></canvas></div></div>
+        <div class="col-lg-5">
+            <div class="chart-card">
+                <h6><i class="fas fa-trophy text-warning"></i> Top Users by SR Volume</h6>
+                <canvas id="topUsersChart" height="220"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="chart-card">
+                <h6><i class="fas fa-chart-line text-info"></i> SR Trend by Status</h6>
+                <canvas id="trendChart" height="220"></canvas>
+            </div>
+        </div>
     </div>
 
     <!-- Summary Tables -->
     <div class="row g-4 mb-4">
-        <div class="col-md-4"><div class="chart-card"><h6><i class="fas fa-building me-2"></i>Top 8 Sites (by issues)</h6><div class="summary-table-container"><table class="summary-table table table-sm"><thead><tr><th>Site ID</th><th>Total</th><th>Open</th><th>P1</th></tr></thead><tbody id="topSitesTable"><tr><td colspan="4" class="text-center">—</td></tr></tbody></table></div></div></div>
-        <div class="col-md-4"><div class="chart-card"><h6><i class="fas fa-hourglass-start me-2"></i>Top Aging (Open Issues)</h6><div class="summary-table-container"><table class="summary-table table table-sm"><thead><tr><th>Site ID</th><th>Category</th><th>Aging(d)</th><th>Status</th></tr></thead><tbody id="agingTable"><tr><td colspan="4" class="text-center">—</td></tr></tbody></table></div></div></div>
-        <div class="col-md-4"><div class="chart-card"><h6><i class="fas fa-chart-line me-2"></i>Vendor Performance</h6><div class="summary-table-container"><table class="summary-table table table-sm"><thead><tr><th>Vendor</th><th>Issues</th><th>Open</th><th>Avg Aging</th></tr></thead><tbody id="vendorPerfTable"><tr><td colspan="4" class="text-center">—</td></tr></tbody></table></div></div></div>
+        <div class="col-md-6">
+            <div class="chart-card">
+                <h6><i class="fas fa-hourglass-half text-warning"></i> Aging SR (Need Attention)</h6>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>SR ID</th>
+                                <th>User</th>
+                                <th>Category</th>
+                                <th>Aging (Days)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agingTable">
+                            <tr><td colspan="5" class="text-center">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-card">
+                <h6><i class="fas fa-chart-simple text-primary"></i> User Performance Summary</h6>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>User</th>
+                                <th>Total SR</th>
+                                <th>Open</th>
+                                <th>Resolved</th>
+                                <th>Res Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userSummaryTable">
+                            <tr><td colspan="5" class="text-center">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Detailed Table Panel with Column Filters & Sorting -->
+    <!-- Detail Table Panel -->
     <div id="detailTablePanel" style="display: none;" class="detail-table-container">
         <div class="detail-header-bar">
             <div>
-                <h5 class="mb-0 fw-bold"><i class="fas fa-rectangle-list me-2 text-primary"></i>Issue Details</h5>
+                <h5 class="mb-0 fw-bold"><i class="fas fa-list me-2 text-primary"></i>Service Request Details</h5>
                 <span class="badge bg-secondary mt-1" id="detailCountBadge">0 rows</span>
             </div>
             <div>
-                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-2" onclick="clearAllColumnFilters()"><i class="fas fa-eraser me-1"></i> Clear Filters</button>
-                <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="hideDetailTable()"><i class="fas fa-times me-1"></i> Close</button>
+                <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="hideDetailTable()">
+                    <i class="fas fa-times me-1"></i> Close
+                </button>
             </div>
         </div>
         <div class="scroll-table">
-            <div class="table-responsive-wrapper">
-                <table class="detail-table" id="issuesDetailTable">
-                    <thead>
-                        <tr id="filterRow">
-                            <th class="filter-input-cell"><input type="text" id="filterSiteId" placeholder="Filter Site ID" class="form-control form-control-sm"></th>
-                            <th class="filter-input-cell"><input type="text" id="filterProblem" placeholder="Filter Problem" class="form-control form-control-sm"></th>
-                            <th class="filter-input-cell"><select id="filterDetailStatus" class="form-select form-select-sm"><option value="">All Status</option><option value="Open">Open</option><option value="Closed">Closed</option></select></th>
-                            <th class="filter-input-cell"><input type="text" id="filterAging" placeholder="Min aging" class="form-control form-control-sm"></th>
-                            <th class="filter-input-cell"><input type="text" id="filterPIC" placeholder="Filter PIC" class="form-control form-control-sm"></th>
-                            <th class="filter-input-cell"><input type="text" id="filterRootCause" placeholder="Filter RCA" class="form-control form-control-sm"></th>
-                            <th class="filter-input-cell"><input type="text" id="filterCircleDetail" placeholder="Filter Circle" class="form-control form-control-sm"></th>
-                            <th class="filter-input-cell"><input type="text" id="filterVendor" placeholder="Filter Vendor" class="form-control form-control-sm"></th>
-                            <th class="filter-input-cell"><input type="text" id="filterAction" placeholder="Filter Action" class="form-control form-control-sm"></th>
-                            <th class="filter-input-cell"><input type="text" id="filterRemark" placeholder="Filter Remark" class="form-control form-control-sm"></th>
-                        </tr>
-                        <tr>
-                            <th class="cursor-sort" onclick="sortBy('siteId')">Site ID <i class="fas fa-sort sort-icon"></i></th>
-                            <th class="cursor-sort" onclick="sortBy('problemCategory')">Problem Category <i class="fas fa-sort sort-icon"></i></th>
-                            <th class="cursor-sort" onclick="sortBy('status')">Status <i class="fas fa-sort sort-icon"></i></th>
-                            <th class="cursor-sort" onclick="sortBy('aging')">Aging (days) <i class="fas fa-sort sort-icon"></i></th>
-                            <th class="cursor-sort" onclick="sortBy('pic')">PIC <i class="fas fa-sort sort-icon"></i></th>
-                            <th>Root Cause / RCA</th>
-                            <th class="cursor-sort" onclick="sortBy('circle')">Circle <i class="fas fa-sort sort-icon"></i></th>
-                            <th class="cursor-sort" onclick="sortBy('vendor')">Vendor <i class="fas fa-sort sort-icon"></i></th>
-                            <th>Action / Remarks</th>
-                            <th>Remark BO TX</th>
-                        </tr>
-                    </thead>
-                    <tbody id="detailTableBody">
-                        <tr><td colspan="10" class="text-center py-4">Loading data...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <table class="detail-table">
+                <thead>
+                    <tr>
+                        <th>SR ID</th>
+                        <th>User Name</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Aging (Days)</th>
+                        <th>Created Date</th>
+                        <th>Resolved Date</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody id="detailTableBody">
+                    <tr><td colspan="8" class="text-center py-4">Loading data...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <div class="text-center footer-note pb-3">Data source: Google Sheets (auto-refresh every 30s) | <i class="fas fa-sync-alt"></i> Live updates | Twamp Dashboard</div>
+    <div class="footer-note">
+        <i class="fas fa-database me-1"></i> Data Source: FME Copilot Access Logs | Auto-refresh every 30 seconds
+        <br><i class="fas fa-chart-simple me-1"></i> Quadrant: X-axis = SR Volume, Y-axis = Avg Resolution Time
+    </div>
 </div>
 
 <script>
     Chart.register(ChartDataLabels);
+    
+    // CSV URL - Update with your Google Sheets CSV export URL
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTXDY8x_bI1a8SkNCxREGLm2yPfgFg6NB_p-Eoe09_w0e4FcG8OfNs-4jlBvT1VXH4uMp4rwHLTBry0/pub?gid=0&single=true&output=csv";
+    
     let masterData = [];
     let filteredData = [];
     let charts = {};
-    let currentSortField = 'aging';
-    let currentSortDir = 'desc';
     let autoInterval = null;
+    let currentTooltip = null;
 
-    function updateClock() { const now = new Date(); document.getElementById('liveClock').innerText = now.toLocaleTimeString('en-GB'); }
-    setInterval(updateClock, 1000); updateClock();
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('liveClock').innerText = now.toLocaleTimeString('en-GB');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
     async function loadData() {
         document.getElementById('dataStatusBadge').innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Fetching...';
@@ -301,257 +597,582 @@
             Papa.parse(csvText, { header: true, skipEmptyLines: true, complete: (results) => {
                 if(results.data && results.data.length) {
                     processRawData(results.data);
-                } else { masterData = []; applyFilters(); }
+                } else {
+                    // Sample data for demo if no data
+                    loadSampleData();
+                }
                 document.getElementById('dataStatusBadge').innerHTML = '<i class="fas fa-check-circle"></i> Synced';
-                setTimeout(()=>{ document.getElementById('dataStatusBadge').innerHTML = '<i class="fas fa-cloud"></i> Live'; }, 2000);
+                setTimeout(() => {
+                    document.getElementById('dataStatusBadge').innerHTML = '<i class="fas fa-cloud"></i> Live';
+                }, 2000);
             }});
-        } catch(e) { console.error(e); document.getElementById('dataStatusBadge').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error'; masterData=[]; applyFilters(); }
+        } catch(e) {
+            console.error('Error loading data:', e);
+            loadSampleData();
+            document.getElementById('dataStatusBadge').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Demo Mode';
+        }
+    }
+
+    function loadSampleData() {
+        // Sample data for FME Copilot Access
+        const sampleSRs = [
+            { sr_id: 'SR001', user: 'John Doe', category: 'Access Request', status: 'Resolved', created_date: '2026-03-01', resolved_date: '2026-03-03', description: 'Request FME Copilot access' },
+            { sr_id: 'SR002', user: 'Jane Smith', category: 'Technical Issue', status: 'Open', created_date: '2026-03-10', resolved_date: '', description: 'Copilot not responding' },
+            { sr_id: 'SR003', user: 'Mike Johnson', category: 'Access Request', status: 'Resolved', created_date: '2026-03-05', resolved_date: '2026-03-06', description: 'New user onboarding' },
+            { sr_id: 'SR004', user: 'Sarah Williams', category: 'Bug Report', status: 'In Progress', created_date: '2026-03-08', resolved_date: '', description: 'Error in code generation' },
+            { sr_id: 'SR005', user: 'John Doe', category: 'Feature Request', status: 'Resolved', created_date: '2026-02-28', resolved_date: '2026-03-02', description: 'Add Python support' },
+            { sr_id: 'SR006', user: 'Lisa Brown', category: 'Access Request', status: 'Open', created_date: '2026-03-12', resolved_date: '', description: 'Team access request' },
+            { sr_id: 'SR007', user: 'Jane Smith', category: 'Technical Issue', status: 'In Progress', created_date: '2026-03-07', resolved_date: '', description: 'Integration issue' },
+            { sr_id: 'SR008', user: 'Mike Johnson', category: 'Bug Report', status: 'Resolved', created_date: '2026-03-03', resolved_date: '2026-03-04', description: 'UI glitch' },
+            { sr_id: 'SR009', user: 'Sarah Williams', category: 'Access Request', status: 'Resolved', created_date: '2026-03-02', resolved_date: '2026-03-03', description: 'License upgrade' },
+            { sr_id: 'SR010', user: 'John Doe', category: 'Technical Issue', status: 'Open', created_date: '2026-03-11', resolved_date: '', description: 'Performance slow' },
+            { sr_id: 'SR011', user: 'Lisa Brown', category: 'Feature Request', status: 'Resolved', created_date: '2026-02-25', resolved_date: '2026-03-01', description: 'Export functionality' },
+            { sr_id: 'SR012', user: 'Mike Johnson', category: 'Technical Issue', status: 'Open', created_date: '2026-03-09', resolved_date: '', description: 'API connection failed' },
+            { sr_id: 'SR013', user: 'Jane Smith', category: 'Access Request', status: 'Resolved', created_date: '2026-03-04', resolved_date: '2026-03-05', description: 'Role change' },
+            { sr_id: 'SR014', user: 'John Doe', category: 'Bug Report', status: 'In Progress', created_date: '2026-03-06', resolved_date: '', description: 'Data parsing error' }
+        ];
+        
+        processRawData(sampleSRs);
     }
 
     function processRawData(rows) {
         const dataset = [];
-        const circlesSet = new Set(), categoriesSet = new Set();
+        const categoriesSet = new Set();
+        
         rows.forEach(row => {
-            const siteId = (row['Site ID'] || row['Site ID Problem'] || row['Site ID'] || '').trim();
-            if(!siteId) return;
-            let priorityRaw = (row['Priority'] || '').toString().toUpperCase();
-            let priority = (priorityRaw.includes('P1') || priorityRaw === 'P1') ? 'P1' : 'P2';
-            let statusChronic = (row['Status Chronic'] || row['Status'] || row['Final Status'] || '').toString().trim();
-            let status = (statusChronic.toLowerCase().includes('closed') || statusChronic.toLowerCase() === 'closed') ? 'Closed' : 'Open';
-            let agingVal = parseInt(row['Occurance / Sum Issue'] || row['Occurance'] || row['Occurance / Sum Issue'] || 0);
-            if(isNaN(agingVal)) agingVal = 0;
-            let problemCat = (row['RCA Grouping Auto'] || row['Problem'] || row['RCA'] || 'General Issue').trim().substring(0,70);
-            let circle = (row['Circle'] || '').trim();
-            let vendorLink = (row['Vendor Link'] || row['Vendor'] || '').trim();
-            let picFinal = (row['PIC Final'] || row['Update PIC'] || row['PIC'] || 'Unassigned').trim();
-            let rcaDetail = (row['Detail RCA'] || row['RCA'] || '').trim();
-            let actionFSO = (row['Action'] || row['Action FSO'] || row['Action'] || '').trim();
-            let remarkBO = (row['Remark BO TX'] || row['Remark BO TX'] || '').trim();
+            const srId = row['sr_id'] || row['SR ID'] || row['ID'] || `SR${Math.floor(Math.random() * 1000)}`;
+            const user = row['user'] || row['User'] || row['User Name'] || row['username'] || 'Unknown User';
+            const category = row['category'] || row['Category'] || row['SR Category'] || 'General';
+            let status = row['status'] || row['Status'] || 'Open';
             
-            if(circle) circlesSet.add(circle);
-            if(problemCat) categoriesSet.add(problemCat);
+            // Normalize status
+            if (status.toLowerCase().includes('resolv') || status.toLowerCase().includes('closed') || status.toLowerCase() === 'done') {
+                status = 'Resolved';
+            } else if (status.toLowerCase().includes('progress') || status.toLowerCase().includes('wip')) {
+                status = 'In Progress';
+            } else if (status.toLowerCase().includes('open') || status.toLowerCase() === 'new') {
+                status = 'Open';
+            } else {
+                status = status;
+            }
+            
+            // Parse dates and calculate aging
+            let createdDate = row['created_date'] || row['Created Date'] || row['date'] || row['Created'];
+            let resolvedDate = row['resolved_date'] || row['Resolved Date'] || '';
+            
+            let aging = 0;
+            if (createdDate) {
+                const created = new Date(createdDate);
+                const today = new Date();
+                aging = Math.max(0, Math.floor((today - created) / (1000 * 60 * 60 * 24)));
+            } else {
+                aging = Math.floor(Math.random() * 20);
+            }
+            
+            const description = row['description'] || row['Description'] || row['Problem'] || '-';
+            
+            if (category && category !== '') categoriesSet.add(category);
             
             dataset.push({
-                siteId, priority, status, aging: agingVal, problemCategory: problemCat || 'Undefined',
-                circle: circle || 'Unknown', vendor: vendorLink || 'N/A', pic: picFinal || '—',
-                rootCause: rcaDetail || '-', action: actionFSO || '-', remarkBO: remarkBO || '-'
+                sr_id: srId.toString(),
+                user: user.toString(),
+                category: category.toString(),
+                status: status,
+                aging: aging,
+                created_date: createdDate || '-',
+                resolved_date: resolvedDate || '-',
+                description: description.toString().substring(0, 100)
             });
         });
+        
         masterData = dataset;
         
-        const circleSelect = document.getElementById('filterCircle');
-        circleSelect.innerHTML = '<option value="">All Circles</option>';
-        Array.from(circlesSet).sort().forEach(c => { let opt = document.createElement('option'); opt.value = c; opt.innerText = c; circleSelect.appendChild(opt); });
+        // Populate category filter
         const catSelect = document.getElementById('filterCategory');
         catSelect.innerHTML = '<option value="">All Categories</option>';
-        Array.from(categoriesSet).sort().forEach(c => { let opt = document.createElement('option'); opt.value = c; opt.innerText = c; catSelect.appendChild(opt); });
+        Array.from(categoriesSet).sort().forEach(c => {
+            if (c && c !== '') {
+                let opt = document.createElement('option');
+                opt.value = c;
+                opt.innerText = c;
+                catSelect.appendChild(opt);
+            }
+        });
+        
         applyFilters();
     }
 
     function applyFilters() {
-        const searchTerm = document.getElementById('searchSite').value.toLowerCase();
+        const searchTerm = document.getElementById('searchUser').value.toLowerCase();
         const statusFilter = document.getElementById('filterStatus').value;
-        const circleFilter = document.getElementById('filterCircle').value;
         const categoryFilter = document.getElementById('filterCategory').value;
         
         filteredData = masterData.filter(item => {
-            if(searchTerm && !item.siteId.toLowerCase().includes(searchTerm)) return false;
-            if(statusFilter && item.status !== statusFilter) return false;
-            if(circleFilter && item.circle !== circleFilter) return false;
-            if(categoryFilter && item.problemCategory !== categoryFilter) return false;
+            if (searchTerm && !item.user.toLowerCase().includes(searchTerm)) return false;
+            if (statusFilter && item.status !== statusFilter) return false;
+            if (categoryFilter && item.category !== categoryFilter) return false;
             return true;
         });
+        
         updateKPIs();
         updateCharts();
         updateSummaryTables();
-        if(document.getElementById('detailTablePanel').style.display === 'block') {
-            applyDetailFilters();
+        renderQuadrantChart();
+        
+        if (document.getElementById('detailTablePanel').style.display === 'block') {
+            renderDetailTableBody(filteredData);
         }
     }
-    
-    // Apply column filters on detailed data
-    function applyDetailFilters() {
-        let detailFiltered = [...filteredData];
-        const filterSite = document.getElementById('filterSiteId')?.value.toLowerCase() || '';
-        const filterProb = document.getElementById('filterProblem')?.value.toLowerCase() || '';
-        const filterStat = document.getElementById('filterDetailStatus')?.value || '';
-        const filterAgingMin = parseInt(document.getElementById('filterAging')?.value) || 0;
-        const filterPic = document.getElementById('filterPIC')?.value.toLowerCase() || '';
-        const filterRca = document.getElementById('filterRootCause')?.value.toLowerCase() || '';
-        const filterCircleDet = document.getElementById('filterCircleDetail')?.value.toLowerCase() || '';
-        const filterVendor = document.getElementById('filterVendor')?.value.toLowerCase() || '';
-        const filterAction = document.getElementById('filterAction')?.value.toLowerCase() || '';
-        const filterRemark = document.getElementById('filterRemark')?.value.toLowerCase() || '';
+
+    function renderQuadrantChart() {
+        const grid = document.getElementById('quadrantGrid');
+        if (!grid) return;
         
-        detailFiltered = detailFiltered.filter(item => {
-            if(filterSite && !item.siteId.toLowerCase().includes(filterSite)) return false;
-            if(filterProb && !item.problemCategory.toLowerCase().includes(filterProb)) return false;
-            if(filterStat && item.status !== filterStat) return false;
-            if(filterAgingMin > 0 && item.aging < filterAgingMin) return false;
-            if(filterPic && !item.pic.toLowerCase().includes(filterPic)) return false;
-            if(filterRca && !item.rootCause.toLowerCase().includes(filterRca)) return false;
-            if(filterCircleDet && !item.circle.toLowerCase().includes(filterCircleDet)) return false;
-            if(filterVendor && !item.vendor.toLowerCase().includes(filterVendor)) return false;
-            if(filterAction && !item.action.toLowerCase().includes(filterAction)) return false;
-            if(filterRemark && !item.remarkBO.toLowerCase().includes(filterRemark)) return false;
-            return true;
+        grid.innerHTML = '';
+        
+        // Add quadrant labels
+        const labels = [
+            { text: 'CRITICAL\nHigh Volume + Slow', top: '10px', left: '10px', bg: '#dc2626' },
+            { text: 'HIGH VOLUME\nMany SRs', top: '10px', right: '10px', bg: '#f59e0b' },
+            { text: 'SLOW RESOLUTION\nLong Aging', bottom: '10px', left: '10px', bg: '#8b5cf6' },
+            { text: 'OPTIMAL\nGood Performance', bottom: '10px', right: '10px', bg: '#10b981' }
+        ];
+        
+        labels.forEach(label => {
+            const div = document.createElement('div');
+            div.className = 'quadrant-label';
+            div.style.cssText = Object.entries(label)
+                .filter(([k]) => k !== 'text' && k !== 'bg')
+                .map(([k, v]) => `${k}: ${v}`)
+                .join(';');
+            div.style.background = label.bg;
+            div.style.whiteSpace = 'pre-line';
+            div.style.fontSize = '0.65rem';
+            div.style.maxWidth = '100px';
+            div.style.textAlign = 'center';
+            div.innerText = label.text;
+            grid.appendChild(div);
         });
         
-        // Apply sorting
-        detailFiltered.sort((a,b)=>{
-            let aVal = a[currentSortField], bVal = b[currentSortField];
-            if(currentSortField === 'aging') return currentSortDir === 'asc' ? aVal - bVal : bVal - aVal;
-            if(typeof aVal === 'string') return currentSortDir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-            return 0;
+        // Calculate user metrics for quadrant
+        const userMap = new Map();
+        filteredData.forEach(item => {
+            if (!userMap.has(item.user)) {
+                userMap.set(item.user, {
+                    totalSR: 0,
+                    openSR: 0,
+                    totalAging: 0,
+                    avgAging: 0
+                });
+            }
+            const stats = userMap.get(item.user);
+            stats.totalSR++;
+            if (item.status !== 'Resolved') {
+                stats.openSR++;
+                stats.totalAging += item.aging;
+            }
         });
-        renderDetailTableBody(detailFiltered);
-        document.getElementById('detailCountBadge').innerHTML = `${detailFiltered.length} rows`;
-    }
-    
-    function clearAllColumnFilters() {
-        document.getElementById('filterSiteId').value = '';
-        document.getElementById('filterProblem').value = '';
-        document.getElementById('filterDetailStatus').value = '';
-        document.getElementById('filterAging').value = '';
-        document.getElementById('filterPIC').value = '';
-        document.getElementById('filterRootCause').value = '';
-        document.getElementById('filterCircleDetail').value = '';
-        document.getElementById('filterVendor').value = '';
-        document.getElementById('filterAction').value = '';
-        document.getElementById('filterRemark').value = '';
-        applyDetailFilters();
-    }
-    
-    function renderDetailTableBody(data) {
-        const tbody = document.getElementById('detailTableBody');
-        if(!data.length) {
-            tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4">No matching records</td></tr>';
+        
+        // Calculate avg aging for each user
+        const userMetrics = [];
+        userMap.forEach((stats, user) => {
+            const avgAging = stats.openSR > 0 ? stats.totalAging / stats.openSR : 0;
+            userMetrics.push({
+                user: user,
+                totalSR: stats.totalSR,
+                avgAging: avgAging,
+                openSR: stats.openSR
+            });
+        });
+        
+        if (userMetrics.length === 0) {
+            const noDataMsg = document.createElement('div');
+            noDataMsg.style.position = 'absolute';
+            noDataMsg.style.top = '50%';
+            noDataMsg.style.left = '50%';
+            noDataMsg.style.transform = 'translate(-50%, -50%)';
+            noDataMsg.style.color = '#666';
+            noDataMsg.innerText = 'No user data to display';
+            grid.appendChild(noDataMsg);
             return;
         }
-        tbody.innerHTML = data.map(item => `
-            <tr>
-                <td class="site-id-mono"><strong>${escapeHtml(item.siteId)}</strong></td>
-                <td style="max-width: 210px;">${escapeHtml(item.problemCategory.substring(0,65))}${item.problemCategory.length>65?'...':''}</td>
-                <td><span class="badge ${item.status==='Open'?'badge-open':'badge-closed'}">${escapeHtml(item.status)}</span></td>
-                <td><span class="aging-badge ${item.aging>60?'bg-danger':item.aging>30?'bg-warning text-dark':'bg-info'} text-white">${item.aging} d</span></td>
-                <td>${escapeHtml(item.pic)}</td>
-                <td style="max-width: 210px; font-size: 0.7rem;" title="${escapeHtml(item.rootCause)}">${escapeHtml(item.rootCause.substring(0,65))}${item.rootCause.length>65?'...':''}</td>
-                <td>${escapeHtml(item.circle)}</td>
-                <td>${escapeHtml(item.vendor)}</td>
-                <td style="max-width: 180px; font-size: 0.7rem;" title="${escapeHtml(item.action)}">${escapeHtml(item.action.substring(0,55))}${item.action.length>55?'...':''}</td>
-                <td class="remark-cell" style="max-width: 200px; font-size: 0.7rem;" title="${escapeHtml(item.remarkBO)}">${escapeHtml(item.remarkBO.substring(0,60))}${item.remarkBO.length>60?'...':''}</td>
-            </tr>
-        `).join('');
+        
+        // Calculate thresholds
+        const maxSR = Math.max(...userMetrics.map(m => m.totalSR), 1);
+        const maxAging = Math.max(...userMetrics.map(m => m.avgAging), 7);
+        const srThreshold = maxSR * 0.5;
+        const agingThreshold = maxAging * 0.5;
+        
+        // Plot points
+        userMetrics.forEach(metric => {
+            const xPercent = (metric.totalSR / maxSR) * 90;
+            const yPercent = 90 - (metric.avgAging / maxAging) * 80;
+            
+            let bgColor = '#10b981';
+            if (metric.totalSR > srThreshold && metric.avgAging > agingThreshold) bgColor = '#dc2626';
+            else if (metric.totalSR > srThreshold) bgColor = '#f59e0b';
+            else if (metric.avgAging > agingThreshold) bgColor = '#8b5cf6';
+            
+            const size = Math.min(30 + (metric.totalSR / maxSR) * 20, 50);
+            
+            const point = document.createElement('div');
+            point.className = 'quadrant-point';
+            point.style.cssText = `
+                position: absolute;
+                left: ${xPercent}%;
+                top: ${yPercent}%;
+                width: ${size}px;
+                height: ${size}px;
+                background: ${bgColor};
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: ${size > 35 ? '10px' : '8px'};
+                font-weight: bold;
+                cursor: pointer;
+                transform: translate(-50%, -50%);
+                border: 2px solid white;
+                z-index: 5;
+            `;
+            
+            point.innerText = metric.totalSR;
+            
+            point.addEventListener('mouseenter', (e) => {
+                if (currentTooltip) currentTooltip.remove();
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip-bubble';
+                tooltip.style.cssText = `
+                    position: fixed;
+                    background: #1e293b;
+                    color: white;
+                    padding: 8px 14px;
+                    border-radius: 10px;
+                    font-size: 0.75rem;
+                    white-space: nowrap;
+                    z-index: 1000;
+                    font-weight: 500;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                `;
+                tooltip.innerHTML = `
+                    <strong>${escapeHtml(metric.user)}</strong><br>
+                    Total SR: ${metric.totalSR}<br>
+                    Open SR: ${metric.openSR}<br>
+                    Avg Aging: ${metric.avgAging.toFixed(1)} days
+                `;
+                document.body.appendChild(tooltip);
+                const rect = point.getBoundingClientRect();
+                tooltip.style.left = rect.left + rect.width/2 + 'px';
+                tooltip.style.top = rect.top - 35 + 'px';
+                tooltip.style.transform = 'translateX(-50%)';
+                currentTooltip = tooltip;
+            });
+            
+            point.addEventListener('mouseleave', () => {
+                if (currentTooltip) {
+                    currentTooltip.remove();
+                    currentTooltip = null;
+                }
+            });
+            
+            point.addEventListener('click', () => {
+                document.getElementById('searchUser').value = metric.user;
+                applyFilters();
+                showDetailTable();
+            });
+            
+            grid.appendChild(point);
+        });
     }
-    
-    function sortBy(field) {
-        if(currentSortField === field) currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
-        else { currentSortField = field; currentSortDir = 'desc'; }
-        applyDetailFilters();
-    }
-    
+
     function updateKPIs() {
-        document.getElementById('kpiTotal').innerText = masterData.length;
-        document.getElementById('kpiSites').innerText = new Set(masterData.map(d=>d.siteId)).size;
-        document.getElementById('kpiOpen').innerText = filteredData.filter(d=>d.status==='Open').length;
-        document.getElementById('kpiClosed').innerText = filteredData.filter(d=>d.status==='Closed').length;
-        document.getElementById('kpiAging').innerText = filteredData.filter(d=>d.aging > 30).length;
+        const uniqueUsers = new Set(filteredData.map(d => d.user)).size;
+        const totalSR = filteredData.length;
+        const openSR = filteredData.filter(d => d.status !== 'Resolved').length;
+        const closedSR = filteredData.filter(d => d.status === 'Resolved').length;
+        const highAging = filteredData.filter(d => d.aging > 7 && d.status !== 'Resolved').length;
+        const resolutionRate = totalSR > 0 ? ((closedSR / totalSR) * 100).toFixed(1) : 0;
+        
+        document.getElementById('kpiTotalUsers').innerText = uniqueUsers;
+        document.getElementById('kpiTotalSR').innerText = totalSR;
+        document.getElementById('kpiOpenSR').innerText = openSR;
+        document.getElementById('kpiClosedSR').innerText = closedSR;
+        document.getElementById('kpiHighAging').innerText = highAging;
+        document.getElementById('kpiResRate').innerText = resolutionRate + '%';
     }
 
     function updateCharts() {
-        const open = filteredData.filter(d=>d.status==='Open').length;
-        const closed = filteredData.filter(d=>d.status==='Closed').length;
-        if(charts.status) charts.status.destroy();
-        charts.status = new Chart(document.getElementById('statusChart'), { type:'doughnut', data:{ labels:['Open','Closed'], datasets:[{ data:[open,closed], backgroundColor:['#dc2626','#10b981'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:true, plugins:{ legend:{ position:'bottom', labels:{ font:{ size:11, family:"'Inter', sans-serif" } } }, datalabels:{ color:'white', font:{ weight:'bold', size:12 }, formatter:(val,ctx)=>{ let total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total?((val/total)*100).toFixed(1)+'%':''; } } } } });
+        // Status Chart
+        const open = filteredData.filter(d => d.status === 'Open').length;
+        const inProgress = filteredData.filter(d => d.status === 'In Progress').length;
+        const resolved = filteredData.filter(d => d.status === 'Resolved').length;
         
-        let catMap = new Map();
-        filteredData.forEach(d=>{ let c = d.problemCategory; catMap.set(c, (catMap.get(c)||0)+1); });
-        let sortedCat = Array.from(catMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,7);
-        if(charts.category) charts.category.destroy();
-        charts.category = new Chart(document.getElementById('categoryChart'), { type:'bar', data:{ labels:sortedCat.map(c=>c[0]), datasets:[{ data:sortedCat.map(c=>c[1]), backgroundColor:'#3b82f6', borderRadius:8 }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:true, plugins:{ datalabels:{ anchor:'end', align:'right', color:'#000', font:{ weight:'bold', size:11 }, formatter:(v)=>v }, legend:{display:false} }, scales:{ x:{ beginAtZero:true, ticks:{ font:{ size:10 } } }, y:{ ticks:{ font:{ size:10 } } } } } });
+        if (charts.status) charts.status.destroy();
+        charts.status = new Chart(document.getElementById('statusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Open', 'In Progress', 'Resolved'],
+                datasets: [{
+                    data: [open, inProgress, resolved],
+                    backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 11 } } },
+                    datalabels: {
+                        color: 'white',
+                        font: { weight: 'bold', size: 12 },
+                        formatter: (val, ctx) => {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            return total ? ((val / total) * 100).toFixed(1) + '%' : '';
+                        }
+                    }
+                }
+            }
+        });
         
-        let circleMap = new Map();
-        filteredData.forEach(d=>{ let cir = d.circle; circleMap.set(cir, (circleMap.get(cir)||0)+1); });
-        let sortedCircle = Array.from(circleMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,5);
-        if(charts.circle) charts.circle.destroy();
-        charts.circle = new Chart(document.getElementById('circleChart'), { type:'pie', data:{ labels:sortedCircle.map(c=>c[0]), datasets:[{ data:sortedCircle.map(c=>c[1]), backgroundColor:['#0ea5e9','#8b5cf6','#f59e0b','#ef4444','#10b981'] }] }, options:{ plugins:{ datalabels:{ color:'white', font:{ size:11, weight:'bold' }, formatter:(val,ctx)=>{ let total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total?((val/total)*100).toFixed(1)+'%':''; } }, legend:{ position:'right', labels:{ font:{ size:10 } } } } } });
+        // Category Chart
+        const catMap = new Map();
+        filteredData.forEach(d => {
+            catMap.set(d.category, (catMap.get(d.category) || 0) + 1);
+        });
+        const sortedCat = Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]).slice(0, 6);
         
-        let vendorMap = new Map();
-        filteredData.forEach(d=>{ let v = d.vendor || 'Unknown'; vendorMap.set(v, (vendorMap.get(v)||0)+1); });
-        let sortedVendor = Array.from(vendorMap.entries()).sort((a,b)=>b[1]-a[1]);
-        if(charts.vendor) charts.vendor.destroy();
-        charts.vendor = new Chart(document.getElementById('vendorChart'), { type:'bar', data:{ labels:sortedVendor.map(v=>v[0]), datasets:[{ data:sortedVendor.map(v=>v[1]), backgroundColor:'#2c7da0' }] }, options:{ plugins:{ datalabels:{ anchor:'end', align:'top', color:'#000', font:{ size:11, weight:'bold' }, formatter:(v)=>v }, legend:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:10 } } }, x:{ ticks:{ font:{ size:10 } } } } } });
+        if (charts.category) charts.category.destroy();
+        charts.category = new Chart(document.getElementById('categoryChart'), {
+            type: 'bar',
+            data: {
+                labels: sortedCat.map(c => c[0]),
+                datasets: [{
+                    data: sortedCat.map(c => c[1]),
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    datalabels: { anchor: 'end', align: 'top', color: '#000', font: { weight: 'bold', size: 11 }, formatter: v => v },
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { font: { size: 10 } } },
+                    x: { ticks: { font: { size: 10, rotation: 15 } } }
+                }
+            }
+        });
         
-        let picMap = new Map();
-        filteredData.forEach(d=>{ let p = d.pic; if(p && p!=='—') picMap.set(p, (picMap.get(p)||0)+1); });
-        let topPics = Array.from(picMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,5);
-        if(charts.pic) charts.pic.destroy();
-        charts.pic = new Chart(document.getElementById('picChart'), { type:'pie', data:{ labels:topPics.map(p=>p[0]), datasets:[{ data:topPics.map(p=>p[1]), backgroundColor:['#9b59b6','#3498db','#e67e22','#2ecc71','#e74c3c'] }] }, options:{ plugins:{ datalabels:{ color:'white', font:{ size:11, weight:'bold' }, formatter:(val,ctx)=>{ let total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total?((val/total)*100).toFixed(0)+'%':''; } }, legend:{ position:'right', labels:{ font:{ size:10 } } } } } });
+        // Top Users Chart
+        const userMap = new Map();
+        filteredData.forEach(d => {
+            userMap.set(d.user, (userMap.get(d.user) || 0) + 1);
+        });
+        const topUsers = Array.from(userMap.entries()).sort((a, b) => b[1] - a[1]).slice(0, 6);
+        
+        if (charts.topUsers) charts.topUsers.destroy();
+        charts.topUsers = new Chart(document.getElementById('topUsersChart'), {
+            type: 'bar',
+            data: {
+                labels: topUsers.map(u => u[0].length > 15 ? u[0].substring(0, 15) + '...' : u[0]),
+                datasets: [{
+                    data: topUsers.map(u => u[1]),
+                    backgroundColor: '#8b5cf6',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    datalabels: { anchor: 'end', align: 'right', color: '#000', font: { weight: 'bold', size: 11 }, formatter: v => v },
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { beginAtZero: true, ticks: { font: { size: 10 } } },
+                    y: { ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+        
+        // Trend Chart (by status over time - simplified)
+        const statusByDate = new Map();
+        filteredData.forEach(d => {
+            if (d.created_date !== '-') {
+                const date = d.created_date;
+                if (!statusByDate.has(date)) {
+                    statusByDate.set(date, { Open: 0, 'In Progress': 0, Resolved: 0 });
+                }
+                const stats = statusByDate.get(date);
+                stats[d.status] = (stats[d.status] || 0) + 1;
+            }
+        });
+        
+        const sortedDates = Array.from(statusByDate.keys()).sort().slice(-7);
+        const openTrend = sortedDates.map(d => statusByDate.get(d).Open);
+        const inProgressTrend = sortedDates.map(d => statusByDate.get(d)['In Progress']);
+        const resolvedTrend = sortedDates.map(d => statusByDate.get(d).Resolved);
+        
+        if (charts.trend) charts.trend.destroy();
+        charts.trend = new Chart(document.getElementById('trendChart'), {
+            type: 'line',
+            data: {
+                labels: sortedDates.map(d => d.substring(5)),
+                datasets: [
+                    { label: 'Open', data: openTrend, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', tension: 0.4, fill: true },
+                    { label: 'In Progress', data: inProgressTrend, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', tension: 0.4, fill: true },
+                    { label: 'Resolved', data: resolvedTrend, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.4, fill: true }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    datalabels: { display: false },
+                    legend: { position: 'bottom', labels: { font: { size: 10 } } }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { font: { size: 10 } } },
+                    x: { ticks: { font: { size: 10 } } }
+                }
+            }
+        });
     }
 
     function updateSummaryTables() {
-        let siteMap = new Map();
-        filteredData.forEach(d=>{ let s=d.siteId; if(!siteMap.has(s)) siteMap.set(s,{total:0,open:0,p1:0}); let stat = siteMap.get(s); stat.total++; if(d.status==='Open') stat.open++; if(d.priority==='P1') stat.p1++; });
-        let topSites = Array.from(siteMap.entries()).map(([id,val])=> ({id, ...val})).sort((a,b)=>b.total-a.total).slice(0,8);
-        document.getElementById('topSitesTable').innerHTML = topSites.map(s=>`<tr><td class="site-id-mono">${escapeHtml(s.id)}</td><td class="fw-bold">${s.total}</td><td>${s.open}</td><td>${s.p1}</td></tr>`).join('') || '<tr><td colspan="4" class="text-center">No data</td></tr>';
+        // Aging SR Table
+        const agingSR = filteredData
+            .filter(d => d.status !== 'Resolved' && d.aging > 0)
+            .sort((a, b) => b.aging - a.aging)
+            .slice(0, 10);
         
-        let agingOpen = filteredData.filter(d=>d.status==='Open').sort((a,b)=>b.aging - a.aging).slice(0,8);
-        document.getElementById('agingTable').innerHTML = agingOpen.map(a=>`<tr><td class="site-id-mono">${escapeHtml(a.siteId)}</td><td class="small">${escapeHtml(a.problemCategory.substring(0,35))}</td><td><span class="aging-badge ${a.aging>60?'bg-danger':a.aging>30?'bg-warning':'bg-primary'} text-white">${a.aging}d</span></td><td><span class="badge badge-open">Open</span></td></tr>`).join('') || '<tr><td colspan="4">No open issues</td></tr>';
+        document.getElementById('agingTable').innerHTML = agingSR.map(sr => `
+            <tr>
+                <td><code>${escapeHtml(sr.sr_id)}</code></td>
+                <td><strong>${escapeHtml(sr.user)}</strong></td>
+                <td>${escapeHtml(sr.category)}</td>
+                <td><span class="badge ${sr.aging > 14 ? 'bg-danger' : sr.aging > 7 ? 'bg-warning' : 'bg-info'}">${sr.aging} days</span></td>
+                <td><span class="status-badge status-${sr.status.toLowerCase().replace(' ', '-')}">${sr.status}</span></td>
+            </tr>
+        `).join('') || '<tr><td colspan="5" class="text-center">No aging SR found</td></tr>';
         
-        let vendorPerf = new Map();
-        filteredData.forEach(d=>{ let v = d.vendor; if(!vendorPerf.has(v)) vendorPerf.set(v,{total:0,open:0,sumAging:0,openCount:0}); let rec = vendorPerf.get(v); rec.total++; if(d.status==='Open') { rec.open++; rec.sumAging+=d.aging; rec.openCount++; } });
-        let vendorArr = Array.from(vendorPerf.entries()).map(([name,val])=>({name, total:val.total, open:val.open, avgAging: val.openCount?Math.round(val.sumAging/val.openCount):0})).sort((a,b)=>b.total-a.total);
-        document.getElementById('vendorPerfTable').innerHTML = vendorArr.map(v=>`<tr><td><strong>${escapeHtml(v.name)}</strong></td><td>${v.total}</td><td>${v.open}</td><td>${v.avgAging}d</td></tr>`).join('') || '<tr><td colspan="4">—</td></tr>';
+        // User Summary Table
+        const userSummary = new Map();
+        filteredData.forEach(d => {
+            if (!userSummary.has(d.user)) {
+                userSummary.set(d.user, { total: 0, open: 0, resolved: 0 });
+            }
+            const stats = userSummary.get(d.user);
+            stats.total++;
+            if (d.status === 'Resolved') stats.resolved++;
+            else stats.open++;
+        });
+        
+        const userSummaryArray = Array.from(userSummary.entries())
+            .map(([user, stats]) => ({
+                user,
+                total: stats.total,
+                open: stats.open,
+                resolved: stats.resolved,
+                rate: stats.total > 0 ? ((stats.resolved / stats.total) * 100).toFixed(0) : 0
+            }))
+            .sort((a, b) => b.total - a.total)
+            .slice(0, 10);
+        
+        document.getElementById('userSummaryTable').innerHTML = userSummaryArray.map(u => `
+            <tr>
+                <td><i class="fas fa-user-circle me-1 text-primary"></i> ${escapeHtml(u.user)}</td>
+                <td class="fw-bold">${u.total}</td>
+                <td class="text-warning">${u.open}</td>
+                <td class="text-success">${u.resolved}</td>
+                <td><div class="progress" style="height: 20px; width: 80px;"><div class="progress-bar bg-success" style="width: ${u.rate}%">${u.rate}%</div></div></td>
+            </tr>
+        `).join('');
     }
-    
-    function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>]/g, function(m){ if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m; }); }
-    
+
+    function renderDetailTableBody(data) {
+        const tbody = document.getElementById('detailTableBody');
+        if (!data.length) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4">No matching records</td></tr>';
+            document.getElementById('detailCountBadge').innerHTML = '0 rows';
+            return;
+        }
+        
+        tbody.innerHTML = data.map(item => `
+            <tr>
+                <td><code>${escapeHtml(item.sr_id)}</code></td>
+                <td><strong><i class="fas fa-user me-1 text-primary"></i>${escapeHtml(item.user)}</strong></td>
+                <td>${escapeHtml(item.category)}</td>
+                <td><span class="status-badge status-${item.status.toLowerCase().replace(' ', '-')}">${escapeHtml(item.status)}</span></td>
+                <td><span class="badge ${item.aging > 14 ? 'bg-danger' : item.aging > 7 ? 'bg-warning' : 'bg-secondary'}">${item.aging} d</span></td>
+                <td><small>${escapeHtml(item.created_date)}</small></td>
+                <td><small>${escapeHtml(item.resolved_date)}</small></td>
+                <td><small>${escapeHtml(item.description.substring(0, 60))}${item.description.length > 60 ? '...' : ''}</small></td>
+            </tr>
+        `).join('');
+        document.getElementById('detailCountBadge').innerHTML = `${data.length} rows`;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
     function showDetailTable() {
         document.getElementById('detailTablePanel').style.display = 'block';
-        // attach event listeners to column filters
-        const filterIds = ['filterSiteId','filterProblem','filterDetailStatus','filterAging','filterPIC','filterRootCause','filterCircleDetail','filterVendor','filterAction','filterRemark'];
-        filterIds.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.removeEventListener('input', applyDetailFilters);
-            if(el) el.removeEventListener('change', applyDetailFilters);
-            if(el && (el.tagName === 'INPUT' || el.tagName === 'SELECT')) {
-                el.addEventListener('input', applyDetailFilters);
-                el.addEventListener('change', applyDetailFilters);
-            }
-        });
-        applyDetailFilters();
+        renderDetailTableBody(filteredData);
     }
-    function hideDetailTable() { document.getElementById('detailTablePanel').style.display = 'none'; }
+
+    function hideDetailTable() {
+        document.getElementById('detailTablePanel').style.display = 'none';
+    }
+
     function resetAllFilters() {
-        document.getElementById('searchSite').value='';
-        document.getElementById('filterStatus').value='';
-        document.getElementById('filterCircle').value='';
-        document.getElementById('filterCategory').value='';
+        document.getElementById('searchUser').value = '';
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterCategory').value = '';
         applyFilters();
     }
+
     function exportCSV() {
-        let exportData = [...filteredData];
-        const filterSite = document.getElementById('filterSiteId')?.value;
-        if(document.getElementById('detailTablePanel').style.display === 'block' && filterSite !== undefined) {
-            exportData = [];
-            applyDetailFilters(); // recalc filtered detail
+        if (!filteredData.length) {
+            alert('No data to export');
+            return;
         }
-        let dataToExport = filteredData;
-        if(document.getElementById('detailTablePanel').style.display === 'block') {
-            let temp = [...filteredData];
-            const fSite = document.getElementById('filterSiteId')?.value.toLowerCase() || '';
-            if(fSite) temp = temp.filter(i=>i.siteId.toLowerCase().includes(fSite));
-            dataToExport = temp;
-        }
-        if(!dataToExport.length) return alert('No data to export');
-        let headers = ['Site ID','Status','Aging (days)','Problem Category','Circle','Vendor','PIC','Root Cause','Action','Remark BO TX'];
-        let rows = dataToExport.map(d=>[d.siteId, d.status, d.aging, d.problemCategory, d.circle, d.vendor, d.pic, d.rootCause, d.action, d.remarkBO]);
-        let csvContent = [headers.join(','), ...rows.map(r=>r.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(','))].join('\n');
-        const blob = new Blob([csvContent], {type:'text/csv'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `twamp_issues_${new Date().toISOString().slice(0,19)}.csv`; a.click(); URL.revokeObjectURL(a.href);
+        
+        const headers = ['SR ID', 'User Name', 'Category', 'Status', 'Aging (Days)', 'Created Date', 'Resolved Date', 'Description'];
+        const rows = filteredData.map(d => [
+            d.sr_id, d.user, d.category, d.status, d.aging, d.created_date, d.resolved_date, d.description
+        ]);
+        
+        const csvContent = [headers.join(','), ...rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))].join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `fme_copilot_sr_${new Date().toISOString().slice(0, 19)}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
     }
-    function startAutoRefresh() { if(autoInterval) clearInterval(autoInterval); autoInterval = setInterval(()=> loadData(), 30000); }
-    window.addEventListener('load', ()=>{ loadData(); startAutoRefresh(); });
+
+    function startAutoRefresh() {
+        if (autoInterval) clearInterval(autoInterval);
+        autoInterval = setInterval(() => loadData(), 30000);
+    }
+
+    window.addEventListener('load', () => {
+        loadData();
+        startAutoRefresh();
+    });
 </script>
 </body>
 </html>
